@@ -1,0 +1,37 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Aranya Kanda",
+  "kandaId": "aranya_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Sita's Abduction",
+  "chapter_title_bangla": "সীতা হরণ",
+  "english_text": "In the Panchavati forest, the demon king Ravana plotted to kidnap Sita. He sent Maricha in the guise of a golden deer. Rama went to chase the deer, followed by Lakshmana. Ravana, disguised as an ascetic, approached Sita's cottage, forcibly carried her away in his aerial chariot towards Lanka, while Sita cried out for help.",
+  "short_summary_english": "Ravana deceives Rama and Lakshmana with a golden deer and forcibly abducts Sita from Panchavati.",
+  "moral_lesson_english": "Desire for illusions (the golden deer) leads to grief. Dharma protects only when vigilance is kept.",
+  "characters": [
+    "Rama",
+    "Sita",
+    "Ravana",
+    "Maricha",
+    "Lakshmana"
+  ],
+  "themes": [
+    "deception",
+    "abduction",
+    "vigilance"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

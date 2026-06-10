@@ -1,0 +1,37 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Ayodhya Kanda",
+  "kandaId": "ayodhya_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Rama's Exile",
+  "chapter_title_bangla": "রামের বনবাস",
+  "english_text": "King Dasaratha resolved to crown Rama as the crown prince. However, Queen Kaikeyi, instigated by her maid Manthara, demanded two boons: that her son Bharata be crowned and Rama be exiled to the forest for fourteen years. To preserve his father's truth and honor, Rama accepted the exile cheerfully, preparing to leave Ayodhya with Sita and Lakshmana.",
+  "short_summary_english": "Queen Kaikeyi demands Rama's exile, and Rama cheerfully accepts to uphold his father's word.",
+  "moral_lesson_english": "Fulfilling filial duty (pitru-dharma) stands above personal ambition and comfort.",
+  "characters": [
+    "Rama",
+    "Dasaratha",
+    "Kaikeyi",
+    "Sita",
+    "Lakshmana"
+  ],
+  "themes": [
+    "filial_duty",
+    "sacrifice",
+    "dharma"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

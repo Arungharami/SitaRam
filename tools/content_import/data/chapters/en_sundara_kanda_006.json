@@ -1,0 +1,35 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Sundara Kanda",
+  "kandaId": "sundara_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Hanuman's Devotion",
+  "chapter_title_bangla": "হনুমানের ভক্তি",
+  "english_text": "Hanuman, the mighty monkey commander, resolved to cross the southern ocean to locate Sita. Invoking the name of Lord Rama, he leapt from Mount Mahendra into the sky. Braving fierce monsters and ocean deities, his focus remained unbroken, driven by pure devotion and duty to his Lord.",
+  "short_summary_english": "Hanuman leaps across the ocean to Lanka to search for Sita, overcoming obstacles with devotion.",
+  "moral_lesson_english": "Devotion (bhakti) makes the impossible possible. Faith can cross any ocean of difficulty.",
+  "characters": [
+    "Hanuman",
+    "Rama",
+    "Sita"
+  ],
+  "themes": [
+    "devotion",
+    "faith",
+    "courage"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

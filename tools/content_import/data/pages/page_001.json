@@ -1,0 +1,16 @@
+{
+  "page_number": 1,
+  "status": "reviewed",
+  "raw_text": "[PAGE 1]\nVALMIKI RAMAYANA\nBALA KANDA\nCHAPTER 1: Valmiki and Narada\n\n1. The ascetic Valmiki asked Narada, the chief of sages, pre-eminent in virtuous learning: 'Who is there in the world today who is righteous, heroic, and truthful?'\n2. Narada, who knows the events of all three worlds, heard Valmiki's words and replied with joy: 'Listen, I will tell you of a man who possesses all these rare qualities, born in the Ikshvaku line, named Rama.'",
+  "cleaned_text": "CHAPTER 1: Valmiki and Narada\n\n1. The ascetic Valmiki asked Narada, the chief of sages, pre-eminent in virtuous learning: 'Who is there in the world today who is righteous, heroic, and truthful?'\n2. Narada, who knows the events of all three worlds, heard Valmiki's words and replied with joy: 'Listen, I will tell you of a man who possesses all these rare qualities, born in the Ikshvaku line, named Rama.'",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Ingestion Standard)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Bala Kanda Chapter 1 Page 1",
+    "reviewer_name": null,
+    "approval_date": null
+  }
+}

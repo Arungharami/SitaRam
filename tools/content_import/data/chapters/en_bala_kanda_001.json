@@ -1,0 +1,35 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Bala Kanda",
+  "kandaId": "bala_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Valmiki and Narada",
+  "chapter_title_bangla": "বাল্মীকি এবং নারদ",
+  "english_text": "The ascetic Valmiki asked Narada, the chief of sages, pre-eminent in virtuous learning: 'Who is there in the world today who is righteous, heroic, and truthful?' Narada, who knows the events of all three worlds, heard Valmiki's words and replied with joy: 'Listen, I will tell you of a man who possesses all these rare qualities, born in the Ikshvaku line, named Rama. Rama is self-controlled, powerful, radiant, a defender of dharma, and a helper of all living beings.'",
+  "short_summary_english": "Valmiki inquires about the ideal righteous man, and Narada reveals the virtues of Sri Rama.",
+  "moral_lesson_english": "Dharma is the foundation of character. Truthfulness and self-control are the ultimate strengths.",
+  "characters": [
+    "Valmiki",
+    "Narada",
+    "Rama"
+  ],
+  "themes": [
+    "dharma",
+    "virtue",
+    "truth"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

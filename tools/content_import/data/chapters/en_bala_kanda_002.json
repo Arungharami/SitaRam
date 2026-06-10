@@ -1,0 +1,34 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Bala Kanda",
+  "kandaId": "bala_kanda",
+  "chapter_number": 2,
+  "chapter_title_english": "The Birth of Verse",
+  "chapter_title_bangla": "শ্লোক সৃষ্টি",
+  "english_text": "Valmiki went to the banks of the river Tamasa, accompanied by his disciple Bharadwaja. He beheld a pair of Krauncha birds singing sweetly. Suddenly, a wicked hunter killed the male bird. The female bird wailed in intense grief. Seeing this cruelty, Valmiki was moved to deep compassion and uttered a verse: 'Ma Nishada...' - which became the first shloka (verse) of Sanskrit literature, transforming sorrow into song.",
+  "short_summary_english": "Moved by the death of a Krauncha bird, Valmiki utters a curse that becomes the first poetic verse.",
+  "moral_lesson_english": "Compassion for all living beings is the root of poetry and righteousness.",
+  "characters": [
+    "Valmiki",
+    "Bharadwaja"
+  ],
+  "themes": [
+    "compassion",
+    "poetry",
+    "dharma"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

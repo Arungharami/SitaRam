@@ -1,0 +1,35 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Bala Kanda",
+  "kandaId": "bala_kanda",
+  "chapter_number": 3,
+  "chapter_title_english": "The Great Theme",
+  "chapter_title_bangla": "মহাকাব্যের সূচনা",
+  "english_text": "Lord Brahma appeared before Valmiki and blessed him, saying: 'Write the complete history of Rama. As long as mountains stand and rivers flow, the story of Ramayana will be remembered.' Valmiki sat in deep meditation and beheld the entire history of Rama, Lakshmana, and Sita as clearly as a fruit on his palm, and began composing the epic.",
+  "short_summary_english": "Brahma commands Valmiki to write the epic, and Valmiki sees the entire Ramayana in meditation.",
+  "moral_lesson_english": "Divine inspiration guides those who act with a pure heart and compassion.",
+  "characters": [
+    "Valmiki",
+    "Brahma",
+    "Rama"
+  ],
+  "themes": [
+    "divine_command",
+    "destiny",
+    "inspiration"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}
