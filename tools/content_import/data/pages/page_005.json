@@ -1,8 +1,8 @@
 {
   "page_number": 5,
-  "status": "reviewed",
+  "status": "raw_ocr",
   "raw_text": "[PAGE 5]\nVALMIKI RAMAYANA\nARANYA KANDA\nCHAPTER 1: Sita's Abduction\n\n1. In the Panchavati forest, the demon king Ravana plotted to kidnap Sita. He sent Maricha in the guise of a golden deer. Rama went to hunt the deer, and Lakshmana went to help Rama.\n2. Left alone, Sita was approached by Ravana disguised as an ascetic. He forcibly seized her and carried her away in his aerial chariot Pushpaka towards Lanka.",
-  "cleaned_text": "ARANYA KANDA\nCHAPTER 1: Sita's Abduction\n\n1. In the Panchavati forest, the demon king Ravana plotted to kidnap Sita. He sent Maricha in the guise of a golden deer. Rama went to hunt the deer, and Lakshmana went to help Rama.\n2. Left alone, Sita was approached by Ravana disguised as an ascetic. He forcibly seized her and carried her away in his aerial chariot Pushpaka towards Lanka.",
+  "cleaned_text": "",
   "source_metadata": {
     "source_title": "Valmiki Ramayana (Ingestion Standard)",
     "author_translator": "M. N. Dutt (Public Domain)",

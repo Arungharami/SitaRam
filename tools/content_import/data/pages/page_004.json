@@ -1,8 +1,8 @@
 {
   "page_number": 4,
-  "status": "reviewed",
+  "status": "raw_ocr",
   "raw_text": "[PAGE 4]\nVALMIKI RAMAYANA\nAYODHYA KANDA\nCHAPTER 1: Rama's Exile\n\n1. King Dasaratha, wishing to retire, announced the coronation of Rama. Ayodhya rejoiced. However, Queen Kaikeyi, poisoned by her maid Manthara, demanded two boons.\n2. She demanded that her son Bharata be crowned, and Rama be exiled to the Dandaka forest for fourteen years. To keep his father's word truthful, Rama cheerfully accepted the exile.",
-  "cleaned_text": "AYODHYA KANDA\nCHAPTER 1: Rama's Exile\n\n1. King Dasaratha, wishing to retire, announced the coronation of Rama. Ayodhya rejoiced. However, Queen Kaikeyi, poisoned by her maid Manthara, demanded two boons.\n2. She demanded that her son Bharata be crowned, and Rama be exiled to the Dandaka forest for fourteen years. To keep his father's word truthful, Rama cheerfully accepted the exile.",
+  "cleaned_text": "",
   "source_metadata": {
     "source_title": "Valmiki Ramayana (Ingestion Standard)",
     "author_translator": "M. N. Dutt (Public Domain)",

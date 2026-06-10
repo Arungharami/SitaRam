@@ -1,8 +1,8 @@
 {
   "page_number": 3,
-  "status": "reviewed",
+  "status": "raw_ocr",
   "raw_text": "[PAGE 3]\nVALMIKI RAMAYANA\nBALA KANDA\nCHAPTER 3: The Great Theme\n\n1. Brahma commanded Valmiki to write the complete history of Rama. Valmiki sat in meditation and saw the entire story of Rama, Lakshmana, and Sita as clearly as a fruit in his hand.\n2. He began to compose the sacred poem, detailing Rama's birth, education, and his protection of Vishwamitra's sacrifice.",
-  "cleaned_text": "CHAPTER 3: The Great Theme\n\n1. Brahma commanded Valmiki to write the complete history of Rama. Valmiki sat in meditation and saw the entire story of Rama, Lakshmana, and Sita as clearly as a fruit in his hand.\n2. He began to compose the sacred poem, detailing Rama's birth, education, and his protection of Vishwamitra's sacrifice.",
+  "cleaned_text": "",
   "source_metadata": {
     "source_title": "Valmiki Ramayana (Ingestion Standard)",
     "author_translator": "M. N. Dutt (Public Domain)",

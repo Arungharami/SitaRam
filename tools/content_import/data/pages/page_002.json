@@ -1,8 +1,8 @@
 {
   "page_number": 2,
-  "status": "reviewed",
+  "status": "raw_ocr",
   "raw_text": "[PAGE 2]\nVALMIKI RAMAYANA\nBALA KANDA\nCHAPTER 2: The Birth of Verse\n\n1. Valmiki went to the banks of the river Tamasa. He beheld a pair of Krauncha birds singing sweetly.\n2. Suddenly, a wicked hunter killed the male bird. Seeing the female bird wail in grief, Valmiki was moved to deep compassion and uttered: 'Ma Nishada...' - which became the first verse (shloka) of literature.",
-  "cleaned_text": "CHAPTER 2: The Birth of Verse\n\n1. Valmiki went to the banks of the river Tamasa. He beheld a pair of Krauncha birds singing sweetly.\n2. Suddenly, a wicked hunter killed the male bird. Seeing the female bird wail in grief, Valmiki was moved to deep compassion and uttered: 'Ma Nishada...' - which became the first verse (shloka) of literature.",
+  "cleaned_text": "",
   "source_metadata": {
     "source_title": "Valmiki Ramayana (Ingestion Standard)",
     "author_translator": "M. N. Dutt (Public Domain)",
