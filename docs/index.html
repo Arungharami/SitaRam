@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SitaRam — Valmiki Ramayana App</title>
+  <style>
+    :root {
+      --maroon: #2E0B04;
+      --saffron: #E65100;
+      --gold: #FFB300;
+      --cream: #FFF8F0;
+      --dim: #9E6B50;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--maroon); color: var(--cream); font-family: Georgia, serif; }
+    header {
+      text-align: center;
+      padding: 48px 24px 32px;
+      background: linear-gradient(180deg, #1a0602 0%, #2E0B04 100%);
+      border-bottom: 1px solid #FFB30030;
+    }
+    header .icon { font-size: 56px; margin-bottom: 12px; }
+    header h1 { font-size: 2.4rem; color: var(--gold); letter-spacing: 4px; }
+    header p { color: var(--dim); margin-top: 8px; font-size: 1rem; letter-spacing: 1px; }
+    nav { display: flex; justify-content: center; gap: 24px; padding: 16px; background: #1a0602; }
+    nav a { color: var(--gold); text-decoration: none; font-size: 0.9rem; letter-spacing: 1px; }
+    nav a:hover { text-decoration: underline; }
+    .hero {
+      text-align: center;
+      padding: 60px 24px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .hero h2 { font-size: 1.6rem; color: var(--gold); margin-bottom: 16px; }
+    .hero p { color: var(--dim); line-height: 1.8; font-size: 1.05rem; }
+    .badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 32px 0; }
+    .badge {
+      background: #3D1205;
+      border: 1px solid #FFB30040;
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      color: var(--cream);
+    }
+    .badge span { color: var(--gold); margin-right: 6px; }
+    section { max-width: 700px; margin: 0 auto; padding: 40px 24px; }
+    section h2 { color: var(--gold); font-size: 1.3rem; margin-bottom: 16px; border-bottom: 1px solid #FFB30030; padding-bottom: 8px; }
+    section p, section li { color: var(--dim); line-height: 1.8; margin-bottom: 10px; }
+    section ul { padding-left: 20px; }
+    footer { text-align: center; padding: 32px; color: var(--dim); font-size: 0.85rem; border-top: 1px solid #FFB30020; }
+    a { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="icon">🪔</div>
+  <h1>SitaRam</h1>
+  <p>Read • Listen • Reflect — Valmiki Ramayana</p>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#features">Features</a>
+  <a href="privacy.html">Privacy Policy</a>
+  <a href="terms.html">Terms</a>
+</nav>
+
+<div class="hero">
+  <h2>A Free, Respectful Ramayana Companion</h2>
+  <p>SitaRam brings the wisdom of the Valmiki Ramayana to your fingertips — in English, বাংলা (Bangla), and Español. Free forever. No ads. No subscriptions. No locked content.</p>
+  <div class="badges">
+    <div class="badge"><span>✔</span> Free Forever</div>
+    <div class="badge"><span>✔</span> No Ads</div>
+    <div class="badge"><span>✔</span> No Account Required</div>
+    <div class="badge"><span>✔</span> Multilingual</div>
+    <div class="badge"><span>✔</span> AI Research Guide</div>
+    <div class="badge"><span>✔</span> Public-Domain Text</div>
+  </div>
+</div>
+
+<section id="about">
+  <h2>About the App</h2>
+  <p>SitaRam is developed by <strong>Lead.AI Labs</strong> as a donation-supported spiritual and educational tool. Our mission is to make the Valmiki Ramayana accessible to readers worldwide in their native languages.</p>
+  <p>The AI Research Guide uses Google Gemini for learning and reflection only — it is not a religious authority. All chapter content is sourced from public-domain translations reviewed for accuracy.</p>
+</section>
+
+<section id="features">
+  <h2>Features</h2>
+  <ul>
+    <li>7 Kandas — Bala, Ayodhya, Aranya, Kishkindha, Sundara, Yuddha, Uttara</li>
+    <li>English, বাংলা, and Español reading tabs per chapter</li>
+    <li>AI Guide powered by Google Gemini (optional, your API key)</li>
+    <li>Audio narration support (English &amp; Bangla)</li>
+    <li>Research Dashboard — search by character, theme, kanda, moral</li>
+    <li>Personal reflection notes — stored locally on your device</li>
+    <li>Language switcher in Settings</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Contact</h2>
+  <p>Email: <a href="mailto:a.gharami.325@westcliff.edu">a.gharami.325@westcliff.edu</a></p>
+  <p>Developer: Lead.AI Labs</p>
+  <p>GitHub: <a href="https://github.com/Arungharami/SitaRam">github.com/Arungharami/SitaRam</a></p>
+</section>
+
+<footer>
+  &copy; 2026 Lead.AI Labs · SitaRam · Free &amp; Open · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms</a>
+</footer>
+
+</body>
+</html>
