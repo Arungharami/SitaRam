@@ -23,12 +23,18 @@ class AiService {
   }
 
   // Construct system prompt with safety disclaimer
-  String buildContextPrompt(Chapter chapter, String userQuestion, String? selectedPassage) {
+  String buildContextPrompt(Chapter chapter, String userQuestion, String? selectedPassage, {String languageCode = 'en'}) {
+    final langInstruction = switch (languageCode) {
+      'bn' => 'Always respond in Bengali (Bangla). Use বাংলা script.',
+      'es' => 'Always respond in Spanish (Español).',
+      _ => 'If the question contains Bengali, reply in Bengali. Otherwise, reply in English.',
+    };
+
     return """
-You are SITARAM AI, a respectful, academic, and cautious assistant for the Valmiki Ramayana.
+You are SitaRam AI, a respectful, academic, and cautious assistant for the Valmiki Ramayana.
 
 --- DISCLAIMER ---
-SITARAM AI Guide is for learning and reflection, not a religious authority.
+SitaRam AI Guide is for learning and reflection, not a religious authority.
 
 --- CONTEXT DATABASE ---
 Chapter: ${chapter.kanda} - Chapter ${chapter.chapterNumber}: ${chapter.chapterTitleEnglish} (Bangla: ${chapter.chapterTitleBangla})
@@ -47,7 +53,7 @@ ${selectedPassage ?? '[No passage selected, referencing entire chapter]'}
 1. Cite the app's internal chapter title ("${chapter.chapterTitleEnglish}") and Kanda ("${chapter.kanda}") in your answer.
 2. Under no circumstances invent verse numbers or claim exact scripture wording unless the text is directly shown in the English Text above.
 3. Be respectful and spiritual, yet maintain an educational and objective tone.
-4. If the question contains Bengali, reply in Bengali. Otherwise, reply in English.
+4. $langInstruction
 
 User's Research Question:
 $userQuestion
@@ -55,14 +61,14 @@ $userQuestion
   }
 
   // Execute AI query (Live Gemini vs High-Quality Simulation)
-  Future<String> askAi(Chapter chapter, String question, {String? selectedPassage}) async {
+  Future<String> askAi(Chapter chapter, String question, {String? selectedPassage, String languageCode = 'en'}) async {
     final apiKey = await getApiKey();
-    
+
     if (apiKey == null || apiKey.trim().isEmpty) {
-      return _getSimulatedResponse(chapter, question);
+      return _getSimulatedResponse(chapter, question, languageCode: languageCode);
     }
 
-    final prompt = buildContextPrompt(chapter, question, selectedPassage);
+    final prompt = buildContextPrompt(chapter, question, selectedPassage, languageCode: languageCode);
     
     try {
       final url = Uri.parse(
@@ -105,9 +111,10 @@ $userQuestion
   }
 
   // Pre-compiled offline high-quality answers matching the 7 suggested prompt buttons (Priority 4)
-  String _getSimulatedResponse(Chapter chapter, String question) {
+  String _getSimulatedResponse(Chapter chapter, String question, {String languageCode = 'en'}) {
     final q = question.toLowerCase();
-    final isBangla = _hasBanglaCharacters(question);
+    final isBangla = languageCode == 'bn' || _hasBanglaCharacters(question);
+    final isSpanish = languageCode == 'es';
 
     // Predefined offline simulation database
     Map<String, Map<String, String>> offlineDb = {
@@ -173,43 +180,59 @@ $userQuestion
 
     // Match question keywords to prompt actions
     if (q.contains("simply") || q.contains("সহজ")) {
-      return chDb["explain simply"] ?? _defaultFallback(chapter, false);
+      return chDb["explain simply"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("moral") || q.contains("নৈতিক")) {
-      return chDb["moral lesson"] ?? _defaultFallback(chapter, false);
+      return chDb["moral lesson"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("bangla") || q.contains("বাংলা")) {
-      return chDb["explain in bangla"] ?? _defaultFallback(chapter, true);
+      return chDb["explain in bangla"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("character") || q.contains("চরিত্র")) {
-      return chDb["character analysis"] ?? _defaultFallback(chapter, false);
+      return chDb["character analysis"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("modern") || q.contains("আধুনিক")) {
-      return chDb["modern life lesson"] ?? _defaultFallback(chapter, false);
+      return chDb["modern life lesson"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("research") || q.contains("গবেষণা")) {
-      return chDb["research note"] ?? _defaultFallback(chapter, false);
+      return chDb["research note"] ?? _defaultFallback(chapter, languageCode);
     } else if (q.contains("child") || q.contains("শিশু")) {
-      return chDb["child-friendly explanation"] ?? _defaultFallback(chapter, false);
+      return chDb["child-friendly explanation"] ?? _defaultFallback(chapter, languageCode);
     }
 
     // Default return based on language
-    if (isBangla) {
-      return chDb["explain in bangla"] ?? _defaultFallback(chapter, true);
+    if (isSpanish) {
+      return chDb["explain simply"] != null
+          ? "[Modo simulación — Añade tu Gemini API Key para respuestas completas en español.]\n\n${chDb['explain simply']}"
+          : _defaultFallback(chapter, languageCode);
     }
-    return chDb["explain simply"] ?? _defaultFallback(chapter, false);
+    if (isBangla) {
+      return chDb["explain in bangla"] ?? _defaultFallback(chapter, languageCode);
+    }
+    return chDb["explain simply"] ?? _defaultFallback(chapter, languageCode);
   }
 
-  String _defaultFallback(Chapter chapter, bool isBangla) {
-    if (isBangla) {
+  String _defaultFallback(Chapter chapter, String languageCode) {
+    if (languageCode == 'bn') {
       return """
 [সীতারাম এআই সিমুলেশন - তথ্য নিরাপত্তা ডিসক্লেইমার]
 উৎস: ${chapter.sourceTitle} (অধ্যায় ${chapter.chapterNumber})
 
-SITARAM AI Guide শেখার উদ্দেশ্যে তৈরি, এটি কোনো ধর্মীয় সিদ্ধান্ত নয়।
+SitaRam AI Guide শেখার উদ্দেশ্যে তৈরি, এটি কোনো ধর্মীয় সিদ্ধান্ত নয়।
 এই অধ্যায়ে (${chapter.chapterTitleBangla}):
 ${chapter.banglaText}
 
 *(Gemini API Key যুক্ত করে বাস্তব এআই চালু করতে পারেন।)*""";
     }
+    if (languageCode == 'es') {
+      return """
+[Simulación SitaRam IA — Aviso educativo]
+La Guía de IA de SitaRam es para aprendizaje y reflexión, no es una autoridad religiosa.
+Fuente: ${chapter.sourceTitle} (Kanda: ${chapter.kanda}, Cap: ${chapter.chapterNumber})
+
+Sobre '${chapter.chapterTitleEnglish}':
+${chapter.englishText}
+
+*(Para IA en vivo en español, configura tu Gemini API Key en el ícono de llave.)*""";
+    }
     return """
-[Sitaram AI Simulation - Educational Disclaimer]
-SITARAM AI Guide is for learning and reflection, not a religious authority.
+[SitaRam AI Simulation - Educational Disclaimer]
+SitaRam AI Guide is for learning and reflection, not a religious authority.
 Source: ${chapter.sourceTitle} (Kanda: ${chapter.kanda}, Ch: ${chapter.chapterNumber})
 
 Regarding '${chapter.chapterTitleEnglish}':

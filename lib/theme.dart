@@ -41,12 +41,10 @@ class AppTheme {
       scaffoldBackgroundColor: maroonBg,
       primaryColor: saffronPrimary,
       colorScheme: const ColorScheme.dark(
-        background: maroonBg,
+        surface: cardBgMaroon,
         primary: saffronPrimary,
         secondary: goldAccent,
-        surface: cardBgMaroon,
         onPrimary: Colors.white,
-        onBackground: softCreamText,
         onSurface: softCreamText,
         outline: Colors.white10,
       ),
@@ -87,6 +85,53 @@ class AppTheme {
     );
   }
 
+  // Light Theme
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: const Color(0xFFFFF8F0),
+      primaryColor: saffronPrimary,
+      colorScheme: const ColorScheme.light(
+        surface: Color(0xFFFFF3E0),
+        primary: saffronPrimary,
+        secondary: goldAccent,
+        onPrimary: Colors.white,
+        onSurface: Color(0xFF1F0B05),
+        outline: Colors.black12,
+      ),
+      textTheme: GoogleFonts.outfitTextTheme(
+        ThemeData.light().textTheme,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFFFFF8F0),
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          fontFamily: 'Outfit',
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF1F0B05),
+        ),
+        iconTheme: IconThemeData(color: Color(0xFF1F0B05)),
+      ),
+      cardTheme: CardThemeData(
+        color: Color(0xFFFFF3E0),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: Colors.black12),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFFFFF8F0),
+        selectedItemColor: saffronPrimary,
+        unselectedItemColor: Color(0xFF8D6E63),
+        elevation: 8,
+      ),
+    );
+  }
+
   // Premium container styling helper (lotus styling cards)
   static BoxDecoration devotionalCardDecoration({
     double borderRadius = 16,
@@ -111,10 +156,10 @@ class AppTheme {
     return BoxDecoration(
       color: cardBgMaroon,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: goldAccent.withOpacity(0.4), width: 1.5),
+      border: Border.all(color: goldAccent.withValues(alpha: 0.4), width: 1.5),
       boxShadow: [
         BoxShadow(
-          color: saffronPrimary.withOpacity(0.15),
+          color: saffronPrimary.withValues(alpha: 0.15),
           blurRadius: 10,
           spreadRadius: 2,
         )

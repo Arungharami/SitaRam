@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'l10n/app_localizations.dart';
 import 'theme.dart';
 import 'views/main_layout.dart';
+import 'providers/locale_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,17 +14,21 @@ void main() {
   );
 }
 
-class SitaRamApp extends StatelessWidget {
+class SitaRamApp extends ConsumerWidget {
   const SitaRamApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
     return MaterialApp(
-      title: 'SitaRam - Valmiki Ramayana',
+      title: 'SitaRam',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Defaulting to the beautiful spiritual dark theme
+      themeMode: ThemeMode.dark,
       home: const MainLayout(),
     );
   }

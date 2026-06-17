@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/chapter.dart';
@@ -16,7 +17,7 @@ class ContentService {
       _chapters = jsonList.map((e) => Chapter.fromJson(e)).toList();
       return _chapters;
     } catch (e) {
-      print("Error loading chapters from assets: $e");
+      debugPrint("Error loading chapters from assets: $e");
       return [];
     }
   }
@@ -83,12 +84,19 @@ class ContentService {
         
         final lessonMatch = chapter.moralLessonEnglish.toLowerCase().contains(cleanQuery) ||
                             chapter.moralLessonBangla.toLowerCase().contains(cleanQuery);
-        
+
+        final titleEsMatch = chapter.chapterTitleSpanish.toLowerCase().contains(cleanQuery);
+        final esTextMatch = chapter.spanishText.toLowerCase().contains(cleanQuery);
+        final summaryEsMatch = chapter.shortSummarySpanish.toLowerCase().contains(cleanQuery);
+        final lessonEsMatch = chapter.moralLessonSpanish.toLowerCase().contains(cleanQuery);
+
         final charMatch = chapter.characters.any((c) => c.toLowerCase().contains(cleanQuery));
         final themeMatch = chapter.themes.any((t) => t.toLowerCase().contains(cleanQuery));
 
-        return titleMatch || titleBnMatch || kandaMatch || textMatch || bnTextMatch ||
-               summaryMatch || summaryBnMatch || lessonMatch || charMatch || themeMatch;
+        return titleMatch || titleBnMatch || titleEsMatch || kandaMatch ||
+               textMatch || bnTextMatch || esTextMatch ||
+               summaryMatch || summaryBnMatch || summaryEsMatch ||
+               lessonMatch || lessonEsMatch || charMatch || themeMatch;
       }
 
       return true;

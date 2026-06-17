@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import '../l10n/app_localizations.dart';
 import '../models/chapter.dart';
 import '../services/content_service.dart';
 import '../theme.dart';
@@ -29,7 +30,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _audioPlayer = AudioPlayer();
 
     // Stream listeners
@@ -87,7 +88,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         _audioError = "Audio file not found locally. To test, upload an MP3 file to '${audioDetail.audioFile}' inside the project assets folder.";
         _isAudioLoading = false;
       });
-      print("Error loading asset audio: $e");
+      debugPrint("Error loading asset audio: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -111,6 +112,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final meta = widget.chapter.sourceMetadata;
 
     return Scaffold(
@@ -140,7 +142,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: AppTheme.saffronPrimary,
-                  content: Text('"${widget.chapter.chapterTitleEnglish}" set as active AI context. Tap the "AI Guide" tab below!'),
+                  content: Text(l10n.readerAiSnackbar),
                 ),
               );
             },
@@ -151,11 +153,12 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           indicatorColor: AppTheme.saffronPrimary,
           labelColor: AppTheme.saffronPrimary,
           unselectedLabelColor: AppTheme.textDimMaroon,
-          tabs: const [
-            Tab(text: 'English'),
-            Tab(text: 'বাংলা (Bangla)'),
-            Tab(text: 'Insights'),
-            Tab(text: 'Audio'),
+          tabs: [
+            Tab(text: l10n.readerTabEnglish),
+            Tab(text: l10n.readerTabBangla),
+            Tab(text: l10n.readerTabSpanish),
+            Tab(text: l10n.readerTabInsights),
+            Tab(text: l10n.readerTabAudio),
           ],
         ),
       ),
@@ -164,22 +167,23 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         children: [
           _buildEnglishTab(meta),
           _buildBanglaTab(meta),
-          _buildInsightsTab(meta),
-          _buildAudioTab(),
+          _buildSpanishTab(l10n, meta),
+          _buildInsightsTab(l10n, meta),
+          _buildAudioTab(l10n),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppTheme.saffronPrimary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.auto_awesome_rounded),
-        label: const Text('Ask AI Guide'),
+        label: Text(l10n.readerAskAiGuide),
         onPressed: () {
           ref.read(activeChapterProvider.notifier).state = widget.chapter;
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               backgroundColor: AppTheme.saffronPrimary,
-              content: Text('Switched context. Tap the "AI Guide" bottom tab to speak to the assistant!'),
+              content: Text(l10n.readerAiSnackbar),
             ),
           );
         },
@@ -201,6 +205,38 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           Text(
             widget.chapter.englishText,
             style: TextStyle(fontSize: _fontSize, height: 1.6, color: AppTheme.softCreamText),
+          ),
+          const SizedBox(height: 40),
+          _buildSourceCard(meta, isBangla: false),
+          const SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpanishTab(AppLocalizations l10n, SourceMetadata meta) {
+    if (widget.chapter.spanishText.isEmpty) {
+      return Center(child: Text(l10n.readerSpanishNotLoaded, style: const TextStyle(color: AppTheme.textDimMaroon)));
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.chapter.chapterTitleSpanish.isNotEmpty
+                ? widget.chapter.chapterTitleSpanish
+                : widget.chapter.chapterTitleEnglish,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.goldAccent),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: AppTheme.devotionalCardDecoration(),
+            child: Text(
+              widget.chapter.spanishText,
+              style: TextStyle(fontSize: _fontSize, height: 1.6, color: AppTheme.softCreamText),
+            ),
           ),
           const SizedBox(height: 40),
           _buildSourceCard(meta, isBangla: false),
@@ -252,7 +288,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildInsightsTab(SourceMetadata meta) {
+  Widget _buildInsightsTab(AppLocalizations l10n, SourceMetadata meta) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -260,7 +296,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         children: [
           // English Summary Card
           _buildInsightSection(
-            title: 'English Summary',
+            title: l10n.readerEnglishSummary,
             icon: Icons.summarize_rounded,
             color: AppTheme.saffronPrimary,
             content: widget.chapter.shortSummaryEnglish,
@@ -280,7 +316,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
 
           // Moral Lesson Card
           _buildInsightSection(
-            title: 'Moral Lesson (Dharma)',
+            title: l10n.readerMoralLesson,
             icon: Icons.workspace_premium_rounded,
             color: AppTheme.goldAccent,
             content: widget.chapter.moralLessonEnglish,
@@ -298,7 +334,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           ],
 
           // Characters
-          const Text('Characters Present', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.softCreamText)),
+          Text(l10n.readerCharactersPresent, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.softCreamText)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -306,7 +342,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             children: widget.chapter.characters.map((c) {
               return Chip(
                 avatar: CircleAvatar(
-                  backgroundColor: AppTheme.goldAccent.withOpacity(0.2),
+                  backgroundColor: AppTheme.goldAccent.withValues(alpha: 0.2),
                   child: Text(c[0], style: const TextStyle(fontSize: 10, color: AppTheme.goldAccent)),
                 ),
                 label: Text(c),
@@ -317,7 +353,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           const SizedBox(height: 24),
 
           // Themes
-          const Text('Themes & Principles', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.softCreamText)),
+          Text(l10n.readerThemesPrinciples, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.softCreamText)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -325,7 +361,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             children: widget.chapter.themes.map((t) {
               return Chip(
                 label: Text('#$t'),
-                backgroundColor: Colors.teal.withOpacity(0.12),
+                backgroundColor: Colors.teal.withValues(alpha: 0.12),
                 labelStyle: const TextStyle(color: Colors.tealAccent),
               );
             }).toList(),
@@ -402,7 +438,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildAudioTab() {
+  Widget _buildAudioTab(AppLocalizations l10n) {
     final audioDetail = _audioLanguage == 'en' ? widget.chapter.audioEnglish : widget.chapter.audioBangla;
     final isPlaceholder = audioDetail.status == 'placeholder';
 
@@ -415,8 +451,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppTheme.saffronPrimary.withOpacity(0.12),
-              border: Border.all(color: AppTheme.goldAccent.withOpacity(0.3), width: 2),
+              color: AppTheme.saffronPrimary.withValues(alpha: 0.12),
+              border: Border.all(color: AppTheme.goldAccent.withValues(alpha: 0.3), width: 2),
             ),
             child: Icon(
               Icons.audiotrack_rounded,
@@ -442,7 +478,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('Audio Track: ', style: TextStyle(color: AppTheme.textDimMaroon)),
+              Text(l10n.readerAudioTrack, style: const TextStyle(color: AppTheme.textDimMaroon)),
               const SizedBox(width: 8),
               DropdownButton<String>(
                 value: _audioLanguage,
@@ -473,9 +509,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: AppTheme.goldAccent.withOpacity(0.08),
+                color: AppTheme.goldAccent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.goldAccent.withOpacity(0.3)),
+                border: Border.all(color: AppTheme.goldAccent.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [

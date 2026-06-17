@@ -6,6 +6,7 @@ import 'home_screen.dart';
 import 'research_dashboard.dart';
 import 'ai_chat_screen.dart';
 import 'donation_screen.dart';
+import 'settings_screen.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
   const MainLayout({super.key});
@@ -49,6 +50,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               ),
             ),
       const DonationScreen(),
+      const SettingsScreen(),
     ];
 
     return Scaffold(
@@ -85,6 +87,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
             icon: Icon(Icons.favorite_outline_rounded),
             activeIcon: Icon(Icons.favorite_rounded),
             label: 'Support',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_outlined),
+            activeIcon: Icon(Icons.settings_rounded),
+            label: 'Settings',
           ),
         ],
       ),

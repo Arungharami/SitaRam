@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 import '../services/content_service.dart';
 import '../models/chapter.dart';
 import '../theme.dart';
@@ -15,6 +16,7 @@ class ResearchDashboard extends ConsumerStatefulWidget {
 
 class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   static const String _reflectionNotesKey = 'sitaram_reflection_notes';
   bool _isSavingNotes = false;
 
@@ -27,6 +29,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
   @override
   void dispose() {
     _notesController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -51,9 +54,9 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
         _isSavingNotes = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: AppTheme.saffronPrimary,
-          content: Text('Your scriptural reflection notes have been saved locally.'),
+          content: Text(AppLocalizations.of(context)!.researchNotesSaved),
         ),
       );
     }
@@ -69,11 +72,12 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
     final searchResults = ref.watch(searchResultsProvider);
 
     final isSearching = query.isNotEmpty || selectedKanda != null || selectedChar != null || selectedTheme != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppTheme.maroonBg,
       appBar: AppBar(
-        title: const Text('Research & Study Mode'),
+        title: Text(l10n.researchTitle),
       ),
       body: Column(
         children: [
@@ -82,13 +86,14 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search characters, themes, moral lessons, text...',
+                hintText: l10n.researchSearchHint,
                 hintStyle: const TextStyle(color: AppTheme.textDimMaroon, fontSize: 13),
                 prefixIcon: const Icon(Icons.search, color: AppTheme.goldAccent),
                 suffixIcon: isSearching
                     ? IconButton(
                         icon: const Icon(Icons.clear, color: AppTheme.textDimMaroon),
                         onPressed: () {
+                          _searchController.clear();
                           ref.read(searchQueryProvider.notifier).state = '';
                           ref.read(selectedKandaProvider.notifier).state = null;
                           ref.read(selectedCharacterProvider.notifier).state = null;
@@ -111,13 +116,8 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                   borderSide: const BorderSide(color: AppTheme.goldAccent),
                 ),
               ),
+              controller: _searchController,
               onChanged: (val) => ref.read(searchQueryProvider.notifier).state = val,
-              controller: TextEditingController.fromValue(
-                TextEditingValue(
-                  text: query,
-                  selection: TextSelection.collapsed(offset: query.length),
-                ),
-              ),
             ),
           ),
 
@@ -126,17 +126,26 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
-              children: ['All', 'Characters', 'Themes', 'Kandas', 'Lessons', 'Bangla'].map((cat) {
+              children: [
+                {'key': 'All', 'label': l10n.researchFilterAll},
+                {'key': 'Characters', 'label': l10n.researchFilterCharacters},
+                {'key': 'Themes', 'label': l10n.researchFilterThemes},
+                {'key': 'Kandas', 'label': l10n.researchFilterKandas},
+                {'key': 'Lessons', 'label': l10n.researchFilterLessons},
+                {'key': 'Bangla', 'label': l10n.researchFilterBangla},
+              ].map((item) {
+                final cat = item['key']!;
+                final label = item['label']!;
                 final isSelected = activeFilter == cat;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: FilterChip(
-                    label: Text(cat),
+                    label: Text(label),
                     selected: isSelected,
                     onSelected: (selected) {
                       ref.read(searchCategoryFilterProvider.notifier).state = cat;
                     },
-                    selectedColor: AppTheme.saffronPrimary.withOpacity(0.2),
+                    selectedColor: AppTheme.saffronPrimary.withValues(alpha: 0.2),
                     checkmarkColor: AppTheme.saffronPrimary,
                     backgroundColor: AppTheme.cardBgMaroon,
                     shape: RoundedRectangleBorder(
@@ -154,15 +163,15 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
           // 3. Search Results vs Dashboard Mode
           Expanded(
             child: isSearching
-                ? _buildSearchResultsView(searchResults, query)
-                : _buildDashboardDefaultView(),
+                ? _buildSearchResultsView(l10n, searchResults, query)
+                : _buildDashboardDefaultView(l10n),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchResultsView(List<Chapter> results, String query) {
+  Widget _buildSearchResultsView(AppLocalizations l10n, List<Chapter> results, String query) {
     if (results.isEmpty) {
       return Center(
         child: Padding(
@@ -172,10 +181,10 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
             children: [
               const Icon(Icons.search_off_rounded, size: 50, color: AppTheme.textDimMaroon),
               const SizedBox(height: 12),
-              const Text('No Matches Found', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(l10n.researchNoResults, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 6),
               Text(
-                'Try adjusting your keywords or clearing the filter chips.',
+                l10n.researchNoResultsHint,
                 style: TextStyle(color: AppTheme.textDimMaroon, fontSize: 13),
                 textAlign: TextAlign.center,
               ),
@@ -216,7 +225,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                         style: const TextStyle(fontSize: 10, color: AppTheme.saffronPrimary, fontWeight: FontWeight.bold, letterSpacing: 1),
                       ),
                       Text(
-                        'Chapter ${chapter.chapterNumber}',
+                        '${l10n.readerChapterLabel} ${chapter.chapterNumber}',
                         style: TextStyle(fontSize: 10, color: AppTheme.textDimMaroon),
                       ),
                     ],
@@ -247,7 +256,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                           margin: const EdgeInsets.only(right: 6),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppTheme.goldAccent.withOpacity(0.12),
+                            color: AppTheme.goldAccent.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(c, style: const TextStyle(fontSize: 9, color: AppTheme.goldAccent)),
@@ -256,7 +265,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                           margin: const EdgeInsets.only(right: 6),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withOpacity(0.12),
+                            color: Colors.teal.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text('#$t', style: const TextStyle(fontSize: 9, color: Colors.tealAccent)),
@@ -273,7 +282,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
     );
   }
 
-  Widget _buildDashboardDefaultView() {
+  Widget _buildDashboardDefaultView(AppLocalizations l10n) {
     final characters = ['Rama', 'Sita', 'Hanuman', 'Valmiki', 'Lakshmana', 'Narada', 'Ravana', 'Brahma'];
     final themes = ['dharma', 'virtue', 'truth', 'compassion', 'poetry', 'devotion', 'faith', 'sacrifice'];
 
@@ -284,7 +293,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
         children: [
           // Theme exploration
           Text(
-            'Explore Themes',
+            l10n.researchExploreThemes,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppTheme.goldAccent),
           ),
           const SizedBox(height: 8),
@@ -325,7 +334,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
 
           // Character exploration
           Text(
-            'Explore Characters',
+            l10n.researchExploreCharacters,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppTheme.goldAccent),
           ),
           const SizedBox(height: 8),
@@ -349,7 +358,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                           ),
                           child: CircleAvatar(
                             radius: 26,
-                            backgroundColor: AppTheme.saffronPrimary.withOpacity(0.15),
+                            backgroundColor: AppTheme.saffronPrimary.withValues(alpha: 0.15),
                             child: Text(c[0], style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.goldAccent)),
                           ),
                         ),
@@ -372,19 +381,19 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.edit_note_rounded, color: AppTheme.goldAccent, size: 22),
-                    SizedBox(width: 8),
+                    const Icon(Icons.edit_note_rounded, color: AppTheme.goldAccent, size: 22),
+                    const SizedBox(width: 8),
                     Text(
-                      'Saved Reflection Logs',
+                      l10n.researchNotesTitle,
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppTheme.softCreamText),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Write down your notes, insights, or scriptural logs as you study. Saved locally on your device.',
+                  l10n.researchNotesSubtitle,
                   style: TextStyle(fontSize: 12, color: AppTheme.textDimMaroon),
                 ),
                 const SizedBox(height: 12),
@@ -393,7 +402,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                   maxLines: 5,
                   style: const TextStyle(fontSize: 13, color: AppTheme.softCreamText),
                   decoration: InputDecoration(
-                    hintText: 'Type your reflection notes here...',
+                    hintText: l10n.researchNotesHint,
                     hintStyle: const TextStyle(color: AppTheme.textDimMaroon, fontSize: 12),
                     filled: true,
                     fillColor: AppTheme.templeObsidian,
@@ -416,7 +425,7 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                     icon: _isSavingNotes
                         ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                         : const Icon(Icons.save_rounded, size: 14),
-                    label: const Text('Save Note', style: TextStyle(fontSize: 12)),
+                    label: Text(l10n.researchNotesSave, style: const TextStyle(fontSize: 12)),
                   ),
                 )
               ],
@@ -437,12 +446,12 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Need Deeper Scriptural Insights?',
+                      Text(
+                        l10n.researchAiPrompt,
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.softCreamText),
                       ),
                       Text(
-                        'Ask our AI Guide to analyze character motifs, moral structures, or historical context.',
+                        l10n.researchAiPromptSub,
                         style: TextStyle(fontSize: 11, color: AppTheme.textDimMaroon),
                       ),
                     ],
@@ -455,8 +464,8 @@ class _ResearchDashboardState extends ConsumerState<ResearchDashboard> {
                   onPressed: () {
                     // Quick dialog or suggestion to direct users to AI tab
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Swipe or tap the "AI Guide" bottom tab to open the research assistant.'),
+                      SnackBar(
+                        content: Text(l10n.researchAiSnackbar),
                       ),
                     );
                   },

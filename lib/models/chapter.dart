@@ -91,29 +91,33 @@ class Chapter {
   final String kandaId;
   final String kanda;
   final int chapterNumber;
-  
+
   final String chapterTitleEnglish;
   final String chapterTitleBangla;
-  
+  final String chapterTitleSpanish;
+
   final String englishText;
   final String banglaText;
-  
+  final String spanishText;
+
   final String shortSummaryEnglish;
   final String shortSummaryBangla;
-  
+  final String shortSummarySpanish;
+
   final String moralLessonEnglish;
   final String moralLessonBangla;
-  
+  final String moralLessonSpanish;
+
   final List<String> characters;
   final List<String> themes;
-  
+
   final String sourceTitle;
   final String sourceStatus;
   final String reviewStatus;
-  
+
   final AudiobookDetail audioEnglish;
   final AudiobookDetail audioBangla;
-  
+
   final SourceMetadata sourceMetadata;
 
   Chapter({
@@ -123,12 +127,16 @@ class Chapter {
     required this.chapterNumber,
     required this.chapterTitleEnglish,
     required this.chapterTitleBangla,
+    this.chapterTitleSpanish = '',
     required this.englishText,
     required this.banglaText,
+    this.spanishText = '',
     required this.shortSummaryEnglish,
     required this.shortSummaryBangla,
+    this.shortSummarySpanish = '',
     required this.moralLessonEnglish,
     required this.moralLessonBangla,
+    this.moralLessonSpanish = '',
     required this.characters,
     required this.themes,
     required this.sourceTitle,
@@ -147,12 +155,16 @@ class Chapter {
       chapterNumber: json['chapterNumber'] ?? 0,
       chapterTitleEnglish: json['chapterTitleEnglish'] ?? '',
       chapterTitleBangla: json['chapterTitleBangla'] ?? '',
+      chapterTitleSpanish: json['chapterTitleSpanish'] ?? '',
       englishText: json['englishText'] ?? '',
       banglaText: json['banglaText'] ?? '',
+      spanishText: json['spanishText'] ?? '',
       shortSummaryEnglish: json['shortSummaryEnglish'] ?? '',
       shortSummaryBangla: json['shortSummaryBangla'] ?? '',
+      shortSummarySpanish: json['shortSummarySpanish'] ?? '',
       moralLessonEnglish: json['moralLessonEnglish'] ?? '',
       moralLessonBangla: json['moralLessonBangla'] ?? '',
+      moralLessonSpanish: json['moralLessonSpanish'] ?? '',
       characters: List<String>.from(json['characters'] ?? []),
       themes: List<String>.from(json['themes'] ?? []),
       sourceTitle: json['sourceTitle'] ?? '',
@@ -172,12 +184,16 @@ class Chapter {
       'chapterNumber': chapterNumber,
       'chapterTitleEnglish': chapterTitleEnglish,
       'chapterTitleBangla': chapterTitleBangla,
+      'chapterTitleSpanish': chapterTitleSpanish,
       'englishText': englishText,
       'banglaText': banglaText,
+      'spanishText': spanishText,
       'shortSummaryEnglish': shortSummaryEnglish,
       'shortSummaryBangla': shortSummaryBangla,
+      'shortSummarySpanish': shortSummarySpanish,
       'moralLessonEnglish': moralLessonEnglish,
       'moralLessonBangla': moralLessonBangla,
+      'moralLessonSpanish': moralLessonSpanish,
       'characters': characters,
       'themes': themes,
       'sourceTitle': sourceTitle,
