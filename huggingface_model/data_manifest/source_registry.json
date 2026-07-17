@@ -1,0 +1,63 @@
+{
+  "work": "Valmiki Ramayana",
+  "canonical_english_edition": "m_n_dutt_project_gutenberg",
+  "policy": "Do not mix Sarga numbering or wording across editions without an explicit alignment record.",
+  "sources": [
+    {
+      "edition_id": "m_n_dutt_project_gutenberg_v1",
+      "title": "The Ramayana, Volume 1: Balakandam and Ayodhyakandam",
+      "translator": "Manmatha Nath Dutt",
+      "languages": ["en"],
+      "kandas": ["bala", "ayodhya"],
+      "project_gutenberg_id": 57265,
+      "source_url": "https://www.gutenberg.org/ebooks/57265",
+      "copyright_status": "public_domain_in_usa",
+      "import_status": "not_started",
+      "review_status": "not_started"
+    },
+    {
+      "edition_id": "m_n_dutt_project_gutenberg_v2",
+      "title": "The Ramayana, Volume 2: Aranya, Kishkindha, and Sundara Kandam",
+      "translator": "Manmatha Nath Dutt",
+      "languages": ["en"],
+      "kandas": ["aranya", "kishkindha", "sundara"],
+      "project_gutenberg_id": 57826,
+      "source_url": "https://www.gutenberg.org/ebooks/57826",
+      "copyright_status": "public_domain_in_usa",
+      "import_status": "not_started",
+      "review_status": "not_started"
+    },
+    {
+      "edition_id": "m_n_dutt_project_gutenberg_v3",
+      "title": "The Ramayana, Volume 3: Yuddhakandam",
+      "translator": "Manmatha Nath Dutt",
+      "languages": ["en"],
+      "kandas": ["yuddha"],
+      "project_gutenberg_id": 60188,
+      "source_url": "https://www.gutenberg.org/ebooks/60188",
+      "copyright_status": "public_domain_in_usa",
+      "import_status": "not_started",
+      "review_status": "not_started"
+    },
+    {
+      "edition_id": "m_n_dutt_project_gutenberg_v4",
+      "title": "The Ramayana, Volume 4: Uttara Kanda",
+      "translator": "Manmatha Nath Dutt",
+      "languages": ["en"],
+      "kandas": ["uttara"],
+      "project_gutenberg_id": 62496,
+      "source_url": "https://www.gutenberg.org/ebooks/62496",
+      "copyright_status": "public_domain_in_usa",
+      "import_status": "not_started",
+      "review_status": "not_started"
+    }
+  ],
+  "secondary_comparison_sources": [
+    {
+      "edition_id": "griffith_1895_public_domain",
+      "translator": "Ralph T. H. Griffith",
+      "purpose": "Secondary comparison only; never silently merge its wording or numbering into the canonical Dutt layer.",
+      "copyright_status": "public_domain"
+    }
+  ]
+}
