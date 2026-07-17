@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../models/chapter.dart';
+import '../models/ai_response.dart';
+import '../models/citation.dart';
 import '../providers/locale_provider.dart';
 import '../services/ai_service.dart';
 import '../theme.dart';
+import 'reader_screen.dart';
 
 class AiChatScreen extends ConsumerStatefulWidget {
   final Chapter chapter;
@@ -14,11 +17,30 @@ class AiChatScreen extends ConsumerStatefulWidget {
   ConsumerState<AiChatScreen> createState() => _AiChatScreenState();
 }
 
+class ChatMessage {
+  final String role;
+  final String text;
+  final List<Citation> citations;
+  final String interpretationLabel;
+  final List<String> limitations;
+
+  ChatMessage({
+    required this.role,
+    required this.text,
+    this.citations = const [],
+    this.interpretationLabel = '',
+    this.limitations = const [],
+  });
+}
+
 class _AiChatScreenState extends ConsumerState<AiChatScreen> {
-  final List<Map<String, String>> _messages = [];
+  final List<ChatMessage> _messages = [];
   final TextEditingController _questionController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
+  
+  // RAG Mode: student vs research
+  String _ragMode = 'student'; 
 
   List<Map<String, String>> _getSuggestedPrompts(AppLocalizations l10n) => [
     {"label": l10n.aiGuidePrompt1, "query": l10n.aiGuidePrompt1},
@@ -53,13 +75,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     final l10n = AppLocalizations.of(context)!;
     setState(() {
       _messages.clear();
-      _messages.add({
-        'role': 'assistant',
-        'text': l10n.aiGuideWelcome(
+      _messages.add(ChatMessage(
+        role: 'assistant',
+        text: l10n.aiGuideWelcome(
           widget.chapter.kanda,
           widget.chapter.chapterTitleEnglish,
         ),
-      });
+      ));
     });
   }
 
@@ -91,31 +113,54 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
 
   Future<void> _executeMessage(String text) async {
     setState(() {
-      _messages.add({'role': 'user', 'text': text});
+      _messages.add(ChatMessage(role: 'user', text: text));
       _isLoading = true;
     });
     _scrollToBottom();
 
     final aiService = ref.read(aiServiceProvider);
     final langCode = ref.read(localeProvider).languageCode;
-    final response = await aiService.askAi(widget.chapter, text, languageCode: langCode);
+    
+    try {
+      final aiResponse = await aiService.askRAG(
+        question: text,
+        languageCode: langCode,
+        mode: _ragMode,
+        kandaId: widget.chapter.kandaId,
+      );
 
-    if (mounted) {
-      setState(() {
-        _messages.add({'role': 'assistant', 'text': response});
-        _isLoading = false;
-      });
-      _scrollToBottom();
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            role: 'assistant',
+            text: aiResponse.answer,
+            citations: aiResponse.citations,
+            interpretationLabel: aiResponse.interpretationLabel,
+            limitations: aiResponse.limitations,
+          ));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            role: 'assistant',
+            text: "Failed to receive response from backend: $e",
+          ));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
     }
   }
 
-  void _showApiKeyDialog() async {
-    final aiService = ref.read(aiServiceProvider);
-    final currentKey = await aiService.getApiKey() ?? '';
-    if (!mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    final keyController = TextEditingController(text: currentKey);
-
+  // Feedback modal
+  void _showFeedbackDialog(ChatMessage msg) {
+    String selectedReason = 'citation_correct';
+    final commentController = TextEditingController();
+    
     showDialog(
       context: context,
       builder: (context) {
@@ -123,63 +168,87 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           backgroundColor: AppTheme.cardBgMaroon,
           title: const Row(
             children: [
-              Icon(Icons.vpn_key_rounded, color: AppTheme.goldAccent),
-              SizedBox(width: 10),
-              Flexible(
-                child: Text('Gemini API Settings',
-                    style: TextStyle(fontSize: 18, color: AppTheme.softCreamText)),
-              ),
+              Icon(Icons.feedback_rounded, color: AppTheme.goldAccent),
+              SizedBox(width: 8),
+              Text('Submit Feedback', style: TextStyle(color: AppTheme.softCreamText, fontSize: 18)),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.aiGuideApiKeyInfo,
-                style: const TextStyle(fontSize: 12, color: AppTheme.textDimMaroon),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: keyController,
-                obscureText: true,
-                style: const TextStyle(color: AppTheme.softCreamText),
-                decoration: InputDecoration(
-                  hintText: l10n.aiGuideApiKeyHint,
-                  hintStyle: const TextStyle(color: AppTheme.textDimMaroon),
-                  filled: true,
-                  fillColor: AppTheme.templeObsidian,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-              ),
-            ],
+          content: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Help us improve the RAG safety and accuracy guardrails:',
+                    style: TextStyle(color: AppTheme.textDimMaroon, fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButton<String>(
+                    dropdownColor: AppTheme.cardBgMaroon,
+                    value: selectedReason,
+                    isExpanded: true,
+                    style: const TextStyle(color: AppTheme.softCreamText),
+                    items: const [
+                      DropdownMenuItem(value: 'citation_correct', child: Text('Accurate citation')),
+                      DropdownMenuItem(value: 'incorrect_citation', child: Text('Incorrect Kanda/Sarga citation')),
+                      DropdownMenuItem(value: 'translation_problem', child: Text('Translation wording issue')),
+                      DropdownMenuItem(value: 'safety_concern', child: Text('Disrespectful / ungrounded claim')),
+                      DropdownMenuItem(value: 'too_complicated', child: Text('Response too complicated')),
+                      DropdownMenuItem(value: 'too_simple', child: Text('Response too simple')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        setModalState(() {
+                          selectedReason = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: commentController,
+                    maxLines: 2,
+                    style: const TextStyle(color: AppTheme.softCreamText),
+                    decoration: InputDecoration(
+                      hintText: 'Additional comments (optional)',
+                      hintStyle: const TextStyle(color: AppTheme.textDimMaroon),
+                      fillColor: AppTheme.templeObsidian,
+                      filled: true,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                aiService.deleteApiKey();
-                ref.invalidate(geminiApiKeyProvider);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.aiGuideApiKeyDeleted)),
-                );
-              },
-              child: Text(l10n.aiGuideApiKeyDelete, style: const TextStyle(color: Colors.redAccent)),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: AppTheme.textDimMaroon)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.saffronPrimary),
-              onPressed: () {
-                final key = keyController.text.trim();
-                if (key.isNotEmpty) {
-                  aiService.saveApiKey(key);
-                  ref.invalidate(geminiApiKeyProvider);
+              onPressed: () async {
+                final aiService = ref.read(aiServiceProvider);
+                await aiService.submitFeedback(
+                  feedbackId: DateTime.now().millisecondsSinceEpoch.toString(),
+                  questionId: 'q_id',
+                  answerId: 'a_id',
+                  rating: selectedReason == 'citation_correct' ? 'helpful' : 'unhelpful',
+                  reason: selectedReason,
+                  comment: commentController.text,
+                );
+                if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.aiGuideApiKeySaved)),
+                    const SnackBar(
+                      backgroundColor: AppTheme.saffronPrimary,
+                      content: Text('Feedback successfully submitted. Thank you!'),
+                    ),
                   );
                 }
               },
-              child: Text(l10n.aiGuideApiKeySave, style: const TextStyle(color: Colors.white)),
+              child: const Text('Submit', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -190,11 +259,6 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final apiKeyAsync = ref.watch(geminiApiKeyProvider);
-    final hasKey = apiKeyAsync.maybeWhen(
-      data: (key) => key != null && key.isNotEmpty,
-      orElse: () => false,
-    );
     final prompts = _getSuggestedPrompts(l10n);
 
     return Scaffold(
@@ -202,11 +266,27 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
       appBar: AppBar(
         title: Text(l10n.aiGuideTitle),
         actions: [
-          IconButton(
-            icon: Icon(Icons.vpn_key_rounded,
-                color: hasKey ? AppTheme.goldAccent : AppTheme.textDimMaroon),
-            onPressed: _showApiKeyDialog,
-            tooltip: 'Gemini API Key',
+          // Study Mode selector (Student vs Research)
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: DropdownButton<String>(
+              value: _ragMode,
+              dropdownColor: AppTheme.cardBgMaroon,
+              underline: const SizedBox(),
+              style: const TextStyle(color: AppTheme.goldAccent, fontWeight: FontWeight.bold, fontSize: 13),
+              icon: const Icon(Icons.psychology_outlined, color: AppTheme.goldAccent, size: 18),
+              items: const [
+                DropdownMenuItem(value: 'student', child: Text('Student ')),
+                DropdownMenuItem(value: 'research', child: Text('Research ')),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() {
+                    _ragMode = val;
+                  });
+                }
+              },
+            ),
           )
         ],
       ),
@@ -256,7 +336,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
             ),
           ),
 
-          // Messages
+          // Messages list
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -264,8 +344,8 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
-                final isUser = msg['role'] == 'user';
-                return _buildMessageBubble(l10n, msg['text'] ?? '', isUser);
+                final isUser = msg.role == 'user';
+                return _buildMessageBubble(l10n, msg, isUser);
               },
             ),
           ),
@@ -351,13 +431,13 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
     );
   }
 
-  Widget _buildMessageBubble(AppLocalizations l10n, String text, bool isUser) {
+  Widget _buildMessageBubble(AppLocalizations l10n, ChatMessage msg, bool isUser) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.all(14),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.82),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.86),
         decoration: BoxDecoration(
           color: isUser
               ? AppTheme.saffronPrimary.withValues(alpha: 0.12)
@@ -378,29 +458,120 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.between,
               children: [
-                Icon(
-                  isUser ? Icons.person_outline : Icons.auto_awesome_rounded,
-                  size: 11,
-                  color: isUser ? AppTheme.saffronPrimary : AppTheme.goldAccent,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isUser ? Icons.person_outline : Icons.auto_awesome_rounded,
+                      size: 11,
+                      color: isUser ? AppTheme.saffronPrimary : AppTheme.goldAccent,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      isUser ? l10n.aiGuideResearcher : l10n.aiGuideBotName,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isUser ? AppTheme.saffronPrimary : AppTheme.goldAccent,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 6),
-                Text(
-                  isUser ? l10n.aiGuideResearcher : l10n.aiGuideBotName,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: isUser ? AppTheme.saffronPrimary : AppTheme.goldAccent,
+                // Render label if present
+                if (!isUser && msg.interpretationLabel.isNotEmpty)
+                  Text(
+                    msg.interpretationLabel,
+                    style: const TextStyle(fontSize: 8, color: AppTheme.textDimMaroon, fontStyle: FontStyle.italic),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 6),
             Text(
-              text,
+              msg.text,
               style: const TextStyle(fontSize: 13, height: 1.5, color: AppTheme.softCreamText),
             ),
+            
+            // Citation Cards (Tappable cards)
+            if (!isUser && msg.citations.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(color: Colors.white10),
+              const Text(
+                'EVIDENCE & CITATIONS:',
+                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.goldAccent),
+              ),
+              const SizedBox(height: 6),
+              ...msg.citations.map((citation) {
+                return InkWell(
+                  onTap: () {
+                    // Navigate to ReaderScreen directly using the active list
+                    final chapters = ref.read(chaptersListProvider).value;
+                    if (chapters != null) {
+                      final targetChapter = chapters.firstWhere(
+                        (ch) => ch.chapterNumber == citation.sarga && ch.kandaId.toLowerCase() == citation.kanda.toLowerCase().replaceFirst(' ', '_'),
+                        orElse: () => chapters.first,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ReaderScreen(chapter: targetChapter)),
+                      );
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.templeObsidian,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.goldAccent.withValues(alpha: 0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.bookmark_added_rounded, color: AppTheme.goldAccent, size: 12),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${citation.kanda} · Sarga ${citation.sarga}',
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.goldAccent),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          citation.quotedText,
+                          style: const TextStyle(fontSize: 10, color: AppTheme.textDimMaroon, fontStyle: FontStyle.italic),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+
+            // Feedback and limitations buttons
+            if (!isUser && msg.text.startsWith('Jai') == false) ...[
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.thumb_up_alt_outlined, size: 14, color: AppTheme.textDimMaroon),
+                    onPressed: () => _showFeedbackDialog(msg),
+                    tooltip: 'Helpful',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.thumb_down_alt_outlined, size: 14, color: AppTheme.textDimMaroon),
+                    onPressed: () => _showFeedbackDialog(msg),
+                    tooltip: 'Report issue / feedback',
+                  ),
+                ],
+              )
+            ]
           ],
         ),
       ),

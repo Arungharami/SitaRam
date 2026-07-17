@@ -1,0 +1,71 @@
+{
+  "editionId": "m_n_dutt_public_domain",
+  "generatedAt": "2026-07-17T20:01:18.280398Z",
+  "kandasExpected": 7,
+  "kandasComplete": 0,
+  "sargasExpected": 645,
+  "sargasImported": 7,
+  "sargasTextVerified": 0,
+  "sargasApprovedForRetrieval": 0,
+  "sargasApprovedForApp": 0,
+  "kandaSargaCoverage": {
+    "bala_kanda": {
+      "imported": 1,
+      "expected": 77,
+      "percent": 1.3
+    },
+    "ayodhya_kanda": {
+      "imported": 1,
+      "expected": 119,
+      "percent": 0.84
+    },
+    "aranya_kanda": {
+      "imported": 1,
+      "expected": 75,
+      "percent": 1.33
+    },
+    "kishkindha_kanda": {
+      "imported": 1,
+      "expected": 67,
+      "percent": 1.49
+    },
+    "sundara_kanda": {
+      "imported": 1,
+      "expected": 68,
+      "percent": 1.47
+    },
+    "yuddha_kanda": {
+      "imported": 1,
+      "expected": 128,
+      "percent": 0.78
+    },
+    "uttara_kanda": {
+      "imported": 1,
+      "expected": 111,
+      "percent": 0.9
+    }
+  },
+  "languages": {
+    "en": {
+      "coveragePercent": 1.09,
+      "sargasFilled": 7
+    },
+    "bn": {
+      "coveragePercent": 0.0,
+      "sargasFilled": 0
+    },
+    "es": {
+      "coveragePercent": 0.0,
+      "sargasFilled": 0
+    },
+    "hi": {
+      "coveragePercent": 0.0,
+      "sargasFilled": 0
+    },
+    "sa": {
+      "coveragePercent": 0.0,
+      "sargasFilled": 0
+    }
+  },
+  "blockingIssues": []
+}

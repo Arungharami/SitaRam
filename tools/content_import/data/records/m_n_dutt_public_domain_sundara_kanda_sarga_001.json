@@ -1,0 +1,54 @@
+{
+  "documentId": "m_n_dutt_public_domain_sundara_kanda_sarga_001",
+  "work": "Valmiki Ramayana",
+  "editionId": "m_n_dutt_public_domain",
+  "kandaId": "sundara_kanda",
+  "kandaOrder": 1,
+  "kandaName": "Sundara Kanda",
+  "sargaNumber": 1,
+  "sargaTitleEnglish": "Sarga 1",
+  "sargaTitleBangla": "",
+  "sargaTitleSpanish": "",
+  "sourceLanguage": "en",
+  "sourceText": "Hanuman crossed the southern ocean, located Sita in Lanka, and consoled her.",
+  "translations": {
+    "en": "Hanuman crossed the southern ocean, located Sita in Lanka, and consoled her.",
+    "bn": "",
+    "es": "",
+    "hi": "",
+    "sa": ""
+  },
+  "summary": {
+    "en": "",
+    "bn": "",
+    "es": ""
+  },
+  "moralLesson": {
+    "en": "",
+    "bn": "",
+    "es": ""
+  },
+  "characters": [],
+  "places": [],
+  "events": [],
+  "themes": [],
+  "relationships": [],
+  "keywords": [],
+  "contentType": "source_text",
+  "sourceMetadata": {
+    "sourceTitle": "Valmiki Ramayana",
+    "translator": "Manmatha Nath Dutt",
+    "publicationYear": 1891,
+    "copyrightStatus": "public_domain",
+    "sourceUrl": "https://archive.org/details/valmikiramayana",
+    "sourcePage": "",
+    "contentHash": ""
+  },
+  "review": {
+    "status": "raw_import",
+    "textReviewer": "",
+    "translationReviewer": "",
+    "reviewedAt": "",
+    "notes": ""
+  }
+}

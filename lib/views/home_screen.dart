@@ -61,6 +61,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final chaptersAsync = ref.watch(chaptersListProvider);
+    final activeChapter = ref.watch(activeChapterProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.maroonBg,
@@ -95,6 +96,7 @@ class HomeScreen extends ConsumerWidget {
                                 letterSpacing: 2.0,
                                 fontSize: 16,
                                 color: Colors.white,
+                                shadows: [Shadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2))],
                               ),
                             ),
                           ],
@@ -108,6 +110,96 @@ class HomeScreen extends ConsumerWidget {
                             fontSize: 9,
                             color: AppTheme.goldAccent,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // 1. Continue Reading Widget
+                if (activeChapter != null)
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      padding: const EdgeInsets.all(16),
+                      decoration: AppTheme.lotusCardDecoration(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.menu_book_rounded, color: AppTheme.saffronPrimary, size: 18),
+                              SizedBox(width: 8),
+                              Text(
+                                'CONTINUE READING',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.5,
+                                  color: AppTheme.saffronPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            '${activeChapter.kanda} · Chapter ${activeChapter.chapterNumber}',
+                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.softCreamText),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            activeChapter.chapterTitleEnglish,
+                            style: const TextStyle(fontSize: 13, color: AppTheme.textDimMaroon),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.saffronPrimary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ReaderScreen(chapter: activeChapter)),
+                              );
+                            },
+                            child: const Text('Open Reader', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                // 2. Daily Moral Reflection Widget
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    padding: const EdgeInsets.all(16),
+                    decoration: AppTheme.devotionalCardDecoration(),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.workspace_premium_rounded, color: AppTheme.goldAccent, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'DAILY MORAL REFLECTION',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                                color: AppTheme.goldAccent,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          '"Dharma protects those who protect it." (Dharmo Rakshati Rakshitah). Truthfulness and self-control are the ultimate strengths that steer a righteous path.',
+                          style: TextStyle(fontSize: 13, height: 1.5, fontStyle: FontStyle.italic, color: AppTheme.softCreamText),
                         ),
                       ],
                     ),
@@ -133,7 +225,7 @@ class HomeScreen extends ConsumerWidget {
                     }
 
                     return SliverPadding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.only(bottom: 40),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {

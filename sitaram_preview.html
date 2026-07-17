@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SitaRam App Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+Bengali:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --maroon-bg:      #1F0B05;
+    --temple-obsidian:#170803;
+    --saffron:        #E65100;
+    --saffron-light:  #FF8F00;
+    --gold:           #D4AF37;
+    --card-bg:        #2E130A;
+    --cream:          #FFFDF9;
+    --dim:            #C7B1A8;
+    --border-subtle:  rgba(255,255,255,0.08);
+    --border-gold:    rgba(212,175,55,0.35);
+    --font:           'Outfit', sans-serif;
+    --radius:         14px;
+  }
+
+  body {
+    font-family: var(--font);
+    background: radial-gradient(ellipse at top, #2a0a02 0%, #0D0401 60%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 60px;
+    color: var(--cream);
+  }
+
+  /* PAGE HEADER */
+  .page-header { text-align: center; margin-bottom: 40px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(212,175,55,0.1); border: 1px solid var(--border-gold);
+    border-radius: 100px; padding: 6px 18px;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 16px;
+  }
+  .page-header h1 {
+    font-size: clamp(2.2rem, 6vw, 3.8rem); font-weight: 900; letter-spacing: 5px;
+    background: linear-gradient(135deg, var(--cream) 30%, var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .page-header p { margin-top: 10px; color: var(--dim); font-size: 13px; letter-spacing: 0.5px; }
+
+  /* SCREEN TABS */
+  .screen-tabs {
+    display: flex; gap: 6px; margin-bottom: 32px;
+    background: var(--temple-obsidian); border: 1px solid var(--border-subtle);
+    border-radius: 100px; padding: 5px; flex-wrap: wrap; justify-content: center;
+  }
+  .screen-tab {
+    background: none; border: none; color: var(--dim); font-family: var(--font);
+    font-size: 11px; font-weight: 600; padding: 8px 16px; border-radius: 100px;
+    cursor: pointer; transition: all 0.22s; white-space: nowrap;
+  }
+  .screen-tab.active { background: linear-gradient(135deg, var(--saffron), var(--saffron-light)); color: #fff; box-shadow: 0 4px 14px rgba(230,81,0,0.4); }
+  .screen-tab:not(.active):hover { color: var(--cream); background: rgba(255,255,255,0.05); }
+
+  /* PHONE FRAME */
+  .phone-wrap { position: relative; width: 360px; max-width: 100%; }
+  .phone-frame {
+    background: #0e0e0e; border-radius: 44px; border: 2px solid #2a2a2a;
+    box-shadow: 0 0 0 5px #1a1a1a, 0 0 0 6px #2a2a2a,
+                0 44px 120px rgba(0,0,0,0.85), 0 0 80px rgba(230,81,0,0.06);
+    overflow: hidden;
+  }
+  .phone-notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 26px; background: #0e0e0e;
+    border-radius: 0 0 18px 18px; z-index: 20;
+  }
+  .phone-screen {
+    background: var(--maroon-bg); height: 720px; overflow: hidden;
+    position: relative; display: flex; flex-direction: column;
+  }
+
+  /* SCREENS */
+  .screen { display: none; flex-direction: column; height: 100%; animation: fadeIn 0.28s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: none; } }
+
+  /* SHARED */
+  .app-bar {
+    background: rgba(23,8,3,0.96); padding: 36px 16px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;
+  }
+  .app-bar-title { font-size: 16px; font-weight: 700; color: var(--cream); }
+  .app-bar-icon { color: var(--dim); font-size: 17px; cursor: pointer; }
+  .app-bar-icon:hover { color: var(--gold); }
+
+  .scroll-body {
+    flex: 1; overflow-y: auto; padding: 12px 14px;
+    scrollbar-width: thin; scrollbar-color: rgba(230,81,0,0.25) transparent;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    background: var(--temple-obsidian); display: flex;
+    border-top: 1px solid var(--border-subtle); flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0 6px; cursor: pointer; border: none; background: none; font-family: var(--font);
+    transition: all 0.18s;
+  }
+  .nav-icon { font-size: 18px; line-height: 1; }
+  .nav-label { font-size: 9px; font-weight: 600; margin-top: 3px; color: var(--dim); }
+  .nav-item.active .nav-label { color: var(--saffron); }
+
+  /* ===== HOME / KANDAS ===== */
+  .hero-bar {
+    background: linear-gradient(180deg, rgba(23,8,3,1) 0%, rgba(31,11,5,0.85) 100%);
+    padding: 38px 16px 14px; border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;
+  }
+  .sr-title-row { display: flex; align-items: center; gap: 8px; }
+  .sr-sun { color: var(--gold); font-size: 15px; }
+  .sr-title { font-size: 17px; font-weight: 900; letter-spacing: 2.5px; color: var(--cream); }
+  .sr-tagline { font-size: 9px; color: var(--gold); letter-spacing: 0.8px; margin-top: 3px; font-weight: 500; }
+
+  .kanda-card {
+    background: var(--card-bg); border-radius: 13px;
+    border: 1px solid var(--border-gold);
+    box-shadow: 0 0 14px rgba(212,175,55,0.07), 0 6px 18px rgba(0,0,0,0.35);
+    margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .kanda-card:hover { box-shadow: 0 0 22px rgba(212,175,55,0.16), 0 8px 24px rgba(0,0,0,0.5); }
+  .kanda-header { display: flex; align-items: center; padding: 13px 15px; cursor: pointer; gap: 12px; }
+  .kanda-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .kanda-info { flex: 1; }
+  .kanda-name { font-size: 13px; font-weight: 700; color: var(--cream); }
+  .kanda-count { font-size: 10px; color: var(--dim); margin-top: 1px; }
+  .kanda-chevron { color: var(--dim); font-size: 11px; transition: transform 0.22s; }
+  .kanda-card.open .kanda-chevron { transform: rotate(90deg); color: var(--gold); }
+
+  .kanda-body { display: none; border-top: 1px solid var(--border-subtle); }
+  .kanda-card.open .kanda-body { display: block; }
+  .kanda-desc { padding: 9px 15px; font-size: 11px; color: var(--dim); font-style: italic; line-height: 1.5; }
+  .chapter-item {
+    display: flex; align-items: center; gap: 12px; padding: 9px 15px;
+    border-top: 1px solid var(--border-subtle); cursor: pointer; transition: background 0.15s;
+  }
+  .chapter-item:hover { background: rgba(230,81,0,0.06); }
+  .ch-num {
+    width: 21px; height: 21px; border-radius: 50%;
+    background: rgba(230,81,0,0.14); color: var(--saffron);
+    font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .ch-texts { flex: 1; }
+  .ch-title { font-size: 12px; font-weight: 600; color: var(--cream); }
+  .ch-subtitle { font-size: 10px; color: var(--gold); margin-top: 1px; }
+  .ch-arrow { font-size: 10px; color: var(--dim); }
+
+  /* ===== READER ===== */
+  .reader-tabs {
+    display: flex; background: var(--temple-obsidian);
+    border-bottom: 1px solid var(--border-subtle); flex-shrink: 0; overflow-x: auto;
+  }
+  .reader-tab {
+    flex-shrink: 0; padding: 10px 13px; font-size: 11px; font-weight: 600;
+    color: var(--dim); cursor: pointer; border: none; background: none;
+    font-family: var(--font); border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .reader-tab.active { color: var(--saffron); border-bottom-color: var(--saffron); }
+  .reader-tab:hover:not(.active) { color: var(--cream); }
+
+  .reader-content { flex: 1; overflow-y: auto; padding: 14px; position: relative; }
+  .verse-block {
+    margin-bottom: 18px; padding: 14px; background: var(--card-bg);
+    border-radius: 12px; border: 1px solid var(--border-subtle);
+  }
+  .verse-num { font-size: 9px; font-weight: 700; color: var(--saffron); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 9px; }
+  .verse-text { font-size: 13px; line-height: 1.8; color: var(--cream); }
+  .verse-translation { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--dim); line-height: 1.6; font-style: italic; }
+
+  .audio-bar { background: var(--temple-obsidian); border-top: 1px solid var(--border-subtle); padding: 10px 14px; flex-shrink: 0; }
+  .audio-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .audio-play-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--saffron), var(--saffron-light));
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; box-shadow: 0 3px 10px rgba(230,81,0,0.4); transition: transform 0.15s;
+  }
+  .audio-play-btn:hover { transform: scale(1.08); }
+  .audio-info { flex: 1; }
+  .audio-title { font-size: 11px; font-weight: 600; color: var(--cream); }
+  .audio-langs { display: flex; gap: 6px; margin-top: 3px; }
+  .lang-chip {
+    padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 600;
+    border: 1px solid var(--border-gold); color: var(--dim); cursor: pointer; transition: all 0.2s;
+  }
+  .lang-chip.active { background: var(--gold); color: var(--maroon-bg); border-color: var(--gold); }
+  .audio-timeline { display: flex; align-items: center; gap: 8px; }
+  .audio-slider { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.1); position: relative; cursor: pointer; }
+  .audio-progress { height: 100%; width: 33%; background: linear-gradient(90deg, var(--saffron), var(--gold)); border-radius: 2px; }
+  .audio-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--saffron); position: absolute; left: 31%; top: 50%; transform: translateY(-50%); box-shadow: 0 0 6px var(--saffron); }
+  .audio-time { font-size: 9px; color: var(--dim); }
+
+  .font-fabs { position: absolute; right: 10px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .font-fab {
+    width: 30px; height: 30px; border-radius: 9px;
+    background: var(--card-bg); border: 1px solid var(--border-gold);
+    color: var(--gold); font-family: var(--font); font-weight: 700; font-size: 12px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .font-fab:hover { background: var(--saffron); color: white; border-color: var(--saffron); }
+
+  /* ===== RESEARCH ===== */
+  .search-bar {
+    background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 100px;
+    display: flex; align-items: center; gap: 9px; padding: 9px 15px; margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within { border-color: var(--saffron); }
+  .search-bar input { flex: 1; background: none; border: none; outline: none; color: var(--cream); font-family: var(--font); font-size: 12px; }
+  .search-bar input::placeholder { color: var(--dim); }
+  .search-icon { color: var(--dim); font-size: 15px; }
+
+  .filter-chips { display: flex; gap: 7px; padding: 2px 0 10px; overflow-x: auto; }
+  .filter-chip {
+    padding: 4px 12px; border-radius: 100px; border: 1px solid var(--border-gold);
+    color: var(--dim); font-size: 10px; font-weight: 600; cursor: pointer;
+    white-space: nowrap; transition: all 0.2s; background: transparent; font-family: var(--font);
+  }
+  .filter-chip.active { background: rgba(230,81,0,0.14); color: var(--saffron); border-color: var(--saffron); }
+  .filter-chip:not(.active):hover { color: var(--cream); }
+
+  .result-card {
+    background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 12px;
+    padding: 13px; margin-bottom: 9px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .result-card:hover { border-color: var(--border-gold); box-shadow: 0 0 14px rgba(212,175,55,0.1); }
+  .result-kanda { font-size: 9px; font-weight: 700; color: var(--saffron); letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
+  .result-verse { font-size: 11px; line-height: 1.6; color: var(--cream); }
+  .result-ref { font-size: 10px; color: var(--dim); margin-top: 5px; font-style: italic; }
+
+  .notes-section { margin-top: 14px; }
+  .notes-label { font-size: 9px; font-weight: 700; letter-spacing: 1.2px; color: var(--gold); text-transform: uppercase; margin-bottom: 7px; }
+  .notes-area {
+    width: 100%; background: var(--card-bg); border: 1px solid var(--border-subtle);
+    border-radius: 12px; color: var(--cream); font-family: var(--font); font-size: 12px;
+    padding: 11px; resize: none; outline: none; transition: border-color 0.2s; line-height: 1.6;
+  }
+  .notes-area:focus { border-color: var(--saffron); }
+  .notes-area::placeholder { color: var(--dim); }
+  .save-btn {
+    margin-top: 7px; width: 100%;
+    background: linear-gradient(135deg, var(--saffron), var(--saffron-light));
+    color: white; border: none; border-radius: 10px; font-family: var(--font);
+    font-size: 12px; font-weight: 700; padding: 10px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(230,81,0,0.28); transition: opacity 0.2s, transform 0.15s;
+  }
+  .save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ===== AI GUIDE ===== */
+  .disclaimer-bar {
+    background: rgba(255,165,0,0.05); border-bottom: 1px solid rgba(212,175,55,0.12);
+    padding: 7px 13px; display: flex; align-items: flex-start; gap: 8px; flex-shrink: 0;
+  }
+  .disclaimer-bar .dicon { color: var(--gold); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .disclaimer-bar p { font-size: 10px; color: rgba(255,253,249,0.82); line-height: 1.5; font-weight: 600; }
+
+  .context-banner {
+    background: var(--temple-obsidian); border-bottom: 1px solid var(--border-subtle);
+    padding: 9px 13px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .ctx-icon { color: var(--saffron); font-size: 13px; }
+  .ctx-text { font-size: 11px; font-weight: 700; color: var(--cream); }
+
+  .chat-messages { flex: 1; overflow-y: auto; padding: 11px; display: flex; flex-direction: column; gap: 9px; }
+  .msg-bubble {
+    max-width: 84%; padding: 11px 13px; border-radius: 16px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .msg-bubble.user {
+    align-self: flex-end;
+    background: rgba(230,81,0,0.09); border: 1px solid rgba(230,81,0,0.22); border-bottom-right-radius: 4px;
+  }
+  .msg-bubble.bot {
+    align-self: flex-start;
+    background: var(--card-bg); border: 1px solid rgba(212,175,55,0.18); border-bottom-left-radius: 4px;
+  }
+  .msg-role { font-size: 9px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+  .msg-bubble.user .msg-role { color: var(--saffron); }
+  .msg-bubble.bot .msg-role { color: var(--gold); }
+  .msg-text { font-size: 11px; line-height: 1.6; color: var(--cream); }
+
+  .prompt-chips {
+    background: var(--temple-obsidian); border-top: 1px solid var(--border-subtle);
+    padding: 6px 11px; display: flex; gap: 7px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+  }
+  .prompt-chip {
+    flex-shrink: 0; padding: 4px 11px; border-radius: 100px;
+    background: var(--card-bg); border: 1px solid rgba(212,175,55,0.45);
+    color: var(--gold); font-size: 10px; font-weight: 700; cursor: pointer;
+    font-family: var(--font); white-space: nowrap; transition: all 0.2s;
+  }
+  .prompt-chip:hover { background: rgba(212,175,55,0.1); }
+
+  .chat-input-bar {
+    background: var(--temple-obsidian); padding: 9px 11px;
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  }
+  .chat-input {
+    flex: 1; background: var(--maroon-bg); border: none; border-radius: 100px;
+    color: var(--cream); font-family: var(--font); font-size: 12px; padding: 9px 15px; outline: none;
+  }
+  .chat-input::placeholder { color: var(--dim); }
+  .chat-send {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--saffron), var(--saffron-light));
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; box-shadow: 0 3px 10px rgba(230,81,0,0.4); transition: transform 0.15s;
+  }
+  .chat-send:hover { transform: scale(1.08); }
+
+  /* ===== DONATION ===== */
+  .donation-hero {
+    background: var(--card-bg); border: 1px solid var(--border-gold); border-radius: var(--radius);
+    box-shadow: 0 0 18px rgba(212,175,55,0.09); padding: 20px 15px; text-align: center; margin-bottom: 16px;
+  }
+  .hero-icon { font-size: 36px; margin-bottom: 11px; }
+  .donation-hero h2 { font-size: 15px; font-weight: 700; color: var(--cream); margin-bottom: 7px; }
+  .donation-hero p { font-size: 11px; color: var(--dim); line-height: 1.6; }
+
+  .feature-row { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+  .ficon { color: var(--gold); font-size: 12px; }
+  .feature-row span { font-size: 11px; color: var(--cream); }
+
+  .billing-tabs { display: flex; background: var(--temple-obsidian); border-radius: 10px; overflow: hidden; margin: 14px 0 10px; }
+  .billing-tab {
+    flex: 1; padding: 10px; font-family: var(--font); font-size: 12px; font-weight: 600;
+    border: none; cursor: pointer; color: var(--dim); background: transparent; transition: all 0.2s;
+  }
+  .billing-tab.active { color: var(--saffron); border-bottom: 2px solid var(--saffron); }
+
+  .tier-card {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--card-bg); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 11px 13px; margin-bottom: 7px;
+  }
+  .tier-card.highlight { background: rgba(230,81,0,0.05); border-color: var(--gold); }
+  .tier-info { flex: 1; }
+  .tier-name { font-size: 12px; font-weight: 700; color: var(--cream); }
+  .tier-card.highlight .tier-name { color: var(--gold); }
+  .tier-desc { font-size: 10px; color: var(--dim); margin-top: 2px; }
+  .tier-btn {
+    padding: 7px 13px; border-radius: 9px; border: none; font-family: var(--font);
+    font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s;
+  }
+  .tier-card.highlight .tier-btn { background: var(--saffron); color: white; box-shadow: 0 3px 10px rgba(230,81,0,0.3); }
+  .tier-card:not(.highlight) .tier-btn { background: rgba(255,255,255,0.07); color: var(--cream); }
+  .tier-btn:hover { transform: scale(1.05); }
+  .donate-footer { text-align: center; margin-top: 14px; font-size: 11px; color: var(--dim); font-style: italic; }
+
+  /* ===== SETTINGS ===== */
+  .settings-section-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: var(--gold);
+    text-transform: uppercase; padding: 0 2px 7px; margin-top: 14px;
+  }
+  .settings-card { background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius); overflow: hidden; margin-bottom: 6px; }
+  .lang-option {
+    display: flex; align-items: center; gap: 13px; padding: 13px 15px; cursor: pointer;
+    transition: background 0.15s; border-bottom: 1px solid var(--border-subtle);
+  }
+  .lang-option:last-child { border-bottom: none; }
+  .lang-option:hover { background: rgba(255,255,255,0.03); }
+  .lang-option-name { flex: 1; font-size: 13px; }
+  .lang-option.selected .lang-option-name { color: var(--gold); font-weight: 700; }
+  .lang-option:not(.selected) .lang-option-name { color: var(--cream); }
+  .lang-check { color: var(--gold); }
+  .lang-circle { color: var(--dim); }
+
+  .about-card { background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 15px; margin-bottom: 6px; }
+  .about-app-name { font-size: 16px; font-weight: 700; color: var(--gold); margin-bottom: 7px; }
+  .about-body { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .about-ver { font-size: 10px; color: var(--dim); margin-top: 5px; }
+
+  .settings-link-row {
+    display: flex; align-items: center; gap: 12px; padding: 13px 15px; cursor: pointer;
+    transition: background 0.15s; border-bottom: 1px solid var(--border-subtle);
+  }
+  .settings-link-row:last-child { border-bottom: none; }
+  .settings-link-row:hover { background: rgba(255,255,255,0.03); }
+  .settings-link-icon { color: var(--gold); font-size: 15px; }
+  .settings-link-label { flex: 1; font-size: 13px; color: var(--cream); }
+  .settings-link-arrow { color: var(--dim); font-size: 11px; }
+
+  .jai-ram { text-align: center; margin-top: 22px; font-size: 13px; color: var(--dim); }
+
+  /* INFO GRID */
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px; margin-top: 38px; max-width: 700px; width: 100%;
+  }
+  .info-card {
+    background: var(--card-bg); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius); padding: 16px; text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .info-card:hover { border-color: var(--border-gold); box-shadow: 0 0 16px rgba(212,175,55,0.1); }
+  .ic-icon { font-size: 26px; margin-bottom: 7px; }
+  .ic-title { font-size: 12px; font-weight: 700; color: var(--cream); }
+  .ic-sub { font-size: 10px; color: var(--dim); margin-top: 4px; line-height: 1.4; }
+
+  /* PALETTE */
+  .palette { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 22px; max-width: 700px; width: 100%; }
+  .swatch {
+    display: flex; align-items: center; gap: 9px;
+    background: var(--card-bg); border: 1px solid var(--border-subtle);
+    border-radius: 10px; padding: 9px 13px; flex: 1; min-width: 130px;
+  }
+  .swatch-dot { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; }
+  .sw-name { font-size: 10px; font-weight: 700; color: var(--cream); }
+  .sw-hex { font-size: 9px; color: var(--dim); font-family: monospace; }
+
+  @media (max-width: 480px) { .phone-wrap { width: 100%; } }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="badge">🪷 Devotional App Preview</div>
+  <h1>SITARAM</h1>
+  <p>Explore the Sacred Valmiki Ramayana — Interactive UI Preview</p>
+</header>
+
+<div class="screen-tabs" id="screenTabs">
+  <button class="screen-tab active" onclick="switchScreen('home', this)">📖 Kandas</button>
+  <button class="screen-tab" onclick="switchScreen('reader', this)">📜 Reader</button>
+  <button class="screen-tab" onclick="switchScreen('research', this)">🔍 Research</button>
+  <button class="screen-tab" onclick="switchScreen('ai', this)">✨ AI Guide</button>
+  <button class="screen-tab" onclick="switchScreen('donate', this)">❤️ Support</button>
+  <button class="screen-tab" onclick="switchScreen('settings', this)">⚙️ Settings</button>
+</div>
+
+<div class="phone-wrap">
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- ======= HOME ======= -->
+      <div class="screen active" id="screen-home">
+        <div class="hero-bar">
+          <div class="sr-title-row">
+            <span class="sr-sun">☀</span>
+            <span class="sr-title">SITARAM</span>
+          </div>
+          <div class="sr-tagline">EXPLORE THE SACRED RAMAYANA</div>
+        </div>
+        <div class="scroll-body">
+
+          <div class="kanda-card open">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#FF8C00,#FFB300)"></div>
+              <div class="kanda-info"><div class="kanda-name">Bala Kanda</div><div class="kanda-count">3 chapters loaded</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body">
+              <div class="kanda-desc">The Book of Youth — Rama's birth, divine childhood, and the breaking of Shiva's bow.</div>
+              <div class="chapter-item"><div class="ch-num">1</div><div class="ch-texts"><div class="ch-title">The Birth of Rama</div><div class="ch-subtitle">রামের জন্ম</div></div><span class="ch-arrow">›</span></div>
+              <div class="chapter-item"><div class="ch-num">2</div><div class="ch-texts"><div class="ch-title">Sage Vishwamitra's Request</div><div class="ch-subtitle">বিশ্বামিত্রের প্রার্থনা</div></div><span class="ch-arrow">›</span></div>
+              <div class="chapter-item"><div class="ch-num">3</div><div class="ch-texts"><div class="ch-title">Sita Swayamvar</div><div class="ch-subtitle">সীতার স্বয়ংবর</div></div><span class="ch-arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#E65100,#FF8F00)"></div>
+              <div class="kanda-info"><div class="kanda-name">Ayodhya Kanda</div><div class="kanda-count">2 chapters loaded</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body">
+              <div class="kanda-desc">The Book of Ayodhya — Rama's exile, Dasharatha's grief, and the forest journey.</div>
+              <div class="chapter-item"><div class="ch-num">1</div><div class="ch-texts"><div class="ch-title">Rama's Exile Decreed</div><div class="ch-subtitle">রামের বনবাস</div></div><span class="ch-arrow">›</span></div>
+              <div class="chapter-item"><div class="ch-num">2</div><div class="ch-texts"><div class="ch-title">Bharata's Grief</div><div class="ch-subtitle">ভরতের বিলাপ</div></div><span class="ch-arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#2E7D32,#81C784)"></div>
+              <div class="kanda-info"><div class="kanda-name">Aranya Kanda</div><div class="kanda-count">1 chapter loaded</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body">
+              <div class="kanda-desc">The Book of the Forest — Life in exile and the abduction of Sita.</div>
+              <div class="chapter-item"><div class="ch-num">1</div><div class="ch-texts"><div class="ch-title">Sita's Abduction</div><div class="ch-subtitle">সীতার হরণ</div></div><span class="ch-arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#0277BD,#29B6F6)"></div>
+              <div class="kanda-info"><div class="kanda-name">Kishkindha Kanda</div><div class="kanda-count">Not yet compiled</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body"><div class="kanda-desc">The Book of Kishkindha — Alliance with Sugriva and Hanuman's discovery.</div></div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#D81B60,#F48FB1)"></div>
+              <div class="kanda-info"><div class="kanda-name">Sundara Kanda</div><div class="kanda-count">Not yet compiled</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body"><div class="kanda-desc">The Book of Beauty — Hanuman's leap to Lanka and his meeting with Sita.</div></div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#C62828,#EF5350)"></div>
+              <div class="kanda-info"><div class="kanda-name">Yuddha Kanda</div><div class="kanda-count">Not yet compiled</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body"><div class="kanda-desc">The Book of War — The epic battle against Ravana and Rama's victory.</div></div>
+          </div>
+
+          <div class="kanda-card">
+            <div class="kanda-header" onclick="toggleKanda(this)">
+              <div class="kanda-dot" style="background:linear-gradient(135deg,#6A1B9A,#BA68C8)"></div>
+              <div class="kanda-info"><div class="kanda-name">Uttara Kanda</div><div class="kanda-count">Not yet compiled</div></div>
+              <span class="kanda-chevron">▶</span>
+            </div>
+            <div class="kanda-body"><div class="kanda-desc">The Concluding Book — Rama's reign and the ultimate return.</div></div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+      <!-- ======= READER ======= -->
+      <div class="screen" id="screen-reader">
+        <div class="app-bar">
+          <span class="app-bar-icon" onclick="go('home')" style="font-size:15px">‹</span>
+          <span class="app-bar-title">The Birth of Rama</span>
+          <span class="app-bar-icon">⋮</span>
+        </div>
+        <div class="reader-tabs">
+          <button class="reader-tab active" onclick="switchReaderTab(this)">English</button>
+          <button class="reader-tab" onclick="switchReaderTab(this)">বাংলা</button>
+          <button class="reader-tab" onclick="switchReaderTab(this)">संस्कृत</button>
+          <button class="reader-tab" onclick="switchReaderTab(this)">हिंदी</button>
+          <button class="reader-tab" onclick="switchReaderTab(this)">Translit.</button>
+        </div>
+        <div class="reader-content">
+          <div class="verse-block">
+            <div class="verse-num">Verse 1.1</div>
+            <div class="verse-text">There was a great and glorious king named Dasharatha who ruled the city of Ayodhya, beloved by his people and renowned throughout the three worlds.</div>
+            <div class="verse-translation">🪷 तपःस्वाध्यायनिरतं — Devoted to austerity and self-study, the best among those learned in speech.</div>
+          </div>
+          <div class="verse-block">
+            <div class="verse-num">Verse 1.2</div>
+            <div class="verse-text">He was adorned with all the virtues of a righteous king — learned, wise, and devoted to dharma — a monarch whose fame had spread across all the known realms.</div>
+            <div class="verse-translation">🪷 Firm in his duty, radiant with the glory of truth, his presence was like the sun illuminating the whole world.</div>
+          </div>
+          <div class="verse-block">
+            <div class="verse-num">Verse 1.3</div>
+            <div class="verse-text">His four sons — Rama, Bharata, Lakshmana and Shatrughna — were each endowed with extraordinary qualities, strength, and divine grace.</div>
+            <div class="verse-translation">🪷 Like the four Vedas embodied, the pride of the Ikshvaku dynasty, protectors of all creation.</div>
+          </div>
+          <div class="verse-block">
+            <div class="verse-num">Verse 1.4</div>
+            <div class="verse-text">Among them, Rama shone like the full moon among stars — of incomparable beauty, serene strength, and boundless compassion for all beings.</div>
+            <div class="verse-translation">🪷 His eyes were like blooming lotus petals, his countenance radiant as a thousand suns, yet cooling as the moon.</div>
+          </div>
+          <div class="font-fabs">
+            <button class="font-fab" onclick="adjustFont(1)">A+</button>
+            <button class="font-fab" onclick="adjustFont(-1)">A-</button>
+          </div>
+        </div>
+        <div class="audio-bar">
+          <div class="audio-top">
+            <button class="audio-play-btn" id="audioPlayBtn" data-playing="false" onclick="toggleAudio(this)">▶</button>
+            <div class="audio-info">
+              <div class="audio-title">Bala Kanda · Chapter 1</div>
+              <div class="audio-langs">
+                <span class="lang-chip active" onclick="switchLangChip(this)">EN</span>
+                <span class="lang-chip" onclick="switchLangChip(this)">BN</span>
+              </div>
+            </div>
+          </div>
+          <div class="audio-timeline">
+            <span class="audio-time">2:14</span>
+            <div class="audio-slider"><div class="audio-progress"></div><div class="audio-dot"></div></div>
+            <span class="audio-time">6:48</span>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+      <!-- ======= RESEARCH ======= -->
+      <div class="screen" id="screen-research">
+        <div class="app-bar"><span class="app-bar-title">Research</span><span></span></div>
+        <div class="scroll-body">
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search scripture, characters, themes…" />
+          </div>
+          <div class="filter-chips">
+            <button class="filter-chip active" onclick="setFilter(this)">All</button>
+            <button class="filter-chip" onclick="setFilter(this)">Kanda</button>
+            <button class="filter-chip" onclick="setFilter(this)">Characters</button>
+            <button class="filter-chip" onclick="setFilter(this)">Themes</button>
+            <button class="filter-chip" onclick="setFilter(this)">Places</button>
+          </div>
+          <div class="result-card">
+            <div class="result-kanda">Bala Kanda · Verse 1.1</div>
+            <div class="result-verse">"There was a great and glorious king named Dasharatha who ruled the city of Ayodhya, beloved by his people…"</div>
+            <div class="result-ref">— Related: Ayodhya, Dasharatha, Kingship</div>
+          </div>
+          <div class="result-card">
+            <div class="result-kanda">Bala Kanda · Verse 1.4</div>
+            <div class="result-verse">"Among them, Rama shone like the full moon among stars — of incomparable beauty, serene strength…"</div>
+            <div class="result-ref">— Related: Rama, Divine Form, Dharma</div>
+          </div>
+          <div class="result-card">
+            <div class="result-kanda">Ayodhya Kanda · Verse 2.7</div>
+            <div class="result-verse">"Lakshmana, firm in his brotherly devotion, donned the bark garments of exile to follow Rama."</div>
+            <div class="result-ref">— Related: Lakshmana, Devotion, Exile</div>
+          </div>
+          <div class="notes-section">
+            <div class="notes-label">📝 Reflection Notes</div>
+            <textarea class="notes-area" rows="4" placeholder="Write your personal reflections on this scripture…"></textarea>
+            <button class="save-btn">Save Notes</button>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+      <!-- ======= AI GUIDE ======= -->
+      <div class="screen" id="screen-ai">
+        <div class="app-bar"><span class="app-bar-title">AI Guide</span><span class="app-bar-icon">🔑</span></div>
+        <div class="disclaimer-bar">
+          <span class="dicon">ℹ</span>
+          <p>AI responses are for study only. Always consult traditional commentaries for authentic understanding.</p>
+        </div>
+        <div class="context-banner">
+          <span class="ctx-icon">📚</span>
+          <span class="ctx-text">Context: The Birth of Rama · Bala Kanda</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg-bubble bot">
+            <div class="msg-role"><span>✨</span> Valmiki Guide</div>
+            <div class="msg-text">Jai Shri Ram! 🙏 I am your guide to the <strong>Bala Kanda, Chapter 1 — The Birth of Rama</strong>.<br><br>Ask me anything about the verses, characters, symbolism, or themes of this chapter.</div>
+          </div>
+          <div class="msg-bubble user">
+            <div class="msg-role"><span>👤</span> Researcher</div>
+            <div class="msg-text">What is the deeper meaning of Rama being compared to the full moon?</div>
+          </div>
+          <div class="msg-bubble bot">
+            <div class="msg-role"><span>✨</span> Valmiki Guide</div>
+            <div class="msg-text">The moon symbolism for Rama carries profound meaning:<br><br>🌕 <strong>Coolness</strong> — Rama soothes suffering as moonlight relieves heat.<br>🌕 <strong>Fullness</strong> — Among all the stars (brothers, peers), Rama alone is complete.<br>🌕 <strong>Constancy</strong> — The moon follows its dharmic path, as Rama never deviates from righteousness.</div>
+          </div>
+        </div>
+        <div class="prompt-chips">
+          <button class="prompt-chip" onclick="addMsg(this.textContent)">What is Ayodhya's significance?</button>
+          <button class="prompt-chip" onclick="addMsg(this.textContent)">Who is Dasharatha?</button>
+          <button class="prompt-chip" onclick="addMsg(this.textContent)">Explain Rama's divine nature</button>
+          <button class="prompt-chip" onclick="addMsg(this.textContent)">What is dharma here?</button>
+        </div>
+        <div class="chat-input-bar">
+          <input class="chat-input" id="chatInput" placeholder="Ask about this chapter…" onkeydown="if(event.key==='Enter')sendChat()" />
+          <button class="chat-send" onclick="sendChat()">➤</button>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+      <!-- ======= DONATE ======= -->
+      <div class="screen" id="screen-donate">
+        <div class="app-bar"><span class="app-bar-title">Support</span><span></span></div>
+        <div class="scroll-body">
+          <div class="donation-hero">
+            <div class="hero-icon">🙏</div>
+            <h2>Keep This Seva Free</h2>
+            <p>SitaRam is a volunteer-driven spiritual project. Your support funds translations, audio recordings, and server costs — keeping it free for all devotees.</p>
+          </div>
+          <div class="feature-row"><span class="ficon">✔</span><span>No subscription required — ever</span></div>
+          <div class="feature-row"><span class="ficon">🔓</span><span>All content is free to read and listen</span></div>
+          <div class="feature-row"><span class="ficon">🚫</span><span>Absolutely no advertisements</span></div>
+          <div class="billing-tabs">
+            <button class="billing-tab active" onclick="switchBilling(this,'one-time')">One-Time</button>
+            <button class="billing-tab" onclick="switchBilling(this,'monthly')">Monthly</button>
+          </div>
+          <div id="tiers-one-time">
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Blessing</div><div class="tier-desc">Assists with basic server hosting costs.</div></div><button class="tier-btn">$1.00</button></div>
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Supporter</div><div class="tier-desc">Funds native translation reviews for 10 pages.</div></div><button class="tier-btn">$5.00</button></div>
+            <div class="tier-card highlight"><div class="tier-info"><div class="tier-name">Devotional Support</div><div class="tier-desc">Funds full chapter OCR correction audits.</div></div><button class="tier-btn">$11.00</button></div>
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Community Support</div><div class="tier-desc">Edits Bangla & Spanish summaries.</div></div><button class="tier-btn">$21.00</button></div>
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Lifetime Gratitude</div><div class="tier-desc">Sponsors audiobook narration recordings.</div></div><button class="tier-btn">$51.00</button></div>
+          </div>
+          <div id="tiers-monthly" style="display:none">
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Sustainer</div><div class="tier-desc">Helps ensure database performance monthly.</div></div><button class="tier-btn">$3/mo</button></div>
+            <div class="tier-card highlight"><div class="tier-info"><div class="tier-name">Dharma Patron</div><div class="tier-desc">Supports continuous AI compute credits.</div></div><button class="tier-btn">$7/mo</button></div>
+            <div class="tier-card"><div class="tier-info"><div class="tier-name">Guru Sewak</div><div class="tier-desc">Sponsors ongoing multilingual content work.</div></div><button class="tier-btn">$11/mo</button></div>
+          </div>
+          <div class="donate-footer">🪷 Every contribution is an act of seva. Dhanyavaad. 🪷</div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+      <!-- ======= SETTINGS ======= -->
+      <div class="screen" id="screen-settings">
+        <div class="app-bar"><span class="app-bar-title">Settings</span><span></span></div>
+        <div class="scroll-body">
+          <div class="settings-section-label">Language</div>
+          <div class="settings-card">
+            <div class="lang-option selected" onclick="selectLang(this)"><span class="lang-option-name">English</span><span class="lang-check">✔</span></div>
+            <div class="lang-option" onclick="selectLang(this)"><span class="lang-option-name" style="font-family:'Noto Sans Bengali',sans-serif">বাংলা</span><span class="lang-circle">○</span></div>
+            <div class="lang-option" onclick="selectLang(this)"><span class="lang-option-name">Español</span><span class="lang-circle">○</span></div>
+          </div>
+          <div class="settings-section-label">About</div>
+          <div class="about-card">
+            <div class="about-app-name">SitaRam</div>
+            <div class="about-body">A devotional application presenting the Valmiki Ramayana in multiple languages with AI-guided study tools and audio narration.</div>
+            <div class="about-ver">Version 1.0.0</div>
+          </div>
+          <div class="settings-card" style="margin-top:6px">
+            <div class="settings-link-row"><span class="settings-link-icon">🔒</span><span class="settings-link-label">Privacy Policy</span><span class="settings-link-arrow">›</span></div>
+            <div class="settings-link-row"><span class="settings-link-icon">📄</span><span class="settings-link-label">Terms of Service</span><span class="settings-link-arrow">›</span></div>
+          </div>
+          <div class="jai-ram">🪷 Jai Shri Ram 🪷</div>
+        </div>
+        <div class="bottom-nav">
+          <button class="nav-item" onclick="go('home')"><span class="nav-icon">📖</span><span class="nav-label">Kandas</span></button>
+          <button class="nav-item" onclick="go('research')"><span class="nav-icon">🔭</span><span class="nav-label">Research</span></button>
+          <button class="nav-item" onclick="go('ai')"><span class="nav-icon">✨</span><span class="nav-label">AI Guide</span></button>
+          <button class="nav-item" onclick="go('donate')"><span class="nav-icon">🤍</span><span class="nav-label">Support</span></button>
+          <button class="nav-item" onclick="go('settings')"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- INFO GRID -->
+<div class="info-grid">
+  <div class="info-card"><div class="ic-icon">📖</div><div class="ic-title">7 Kandas</div><div class="ic-sub">Complete Valmiki Ramayana in expandable chapters</div></div>
+  <div class="info-card"><div class="ic-icon">🌐</div><div class="ic-title">5 Languages</div><div class="ic-sub">English · Bengali · Sanskrit · Hindi · Transliteration</div></div>
+  <div class="info-card"><div class="ic-icon">🎙️</div><div class="ic-title">Audio Narration</div><div class="ic-sub">English & Bengali audio with interactive player</div></div>
+  <div class="info-card"><div class="ic-icon">✨</div><div class="ic-title">AI Guide</div><div class="ic-sub">Gemini-powered chapter Q&A</div></div>
+  <div class="info-card"><div class="ic-icon">🔍</div><div class="ic-title">Research Mode</div><div class="ic-sub">Search by keyword, character, theme</div></div>
+  <div class="info-card"><div class="ic-icon">📝</div><div class="ic-title">Reflection Notes</div><div class="ic-sub">Personal scripture journal saved on-device</div></div>
+</div>
+
+<div class="palette">
+  <div class="swatch"><div class="swatch-dot" style="background:#1F0B05;border:1px solid #444"></div><div><div class="sw-name">Temple Maroon</div><div class="sw-hex">#1F0B05</div></div></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#E65100"></div><div><div class="sw-name">Saffron Primary</div><div class="sw-hex">#E65100</div></div></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#D4AF37"></div><div><div class="sw-name">Devotional Gold</div><div class="sw-hex">#D4AF37</div></div></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#FFFDF9;border:1px solid #444"></div><div><div class="sw-name">Soft Ivory</div><div class="sw-hex">#FFFDF9</div></div></div>
+</div>
+
+<script>
+  // ── Screen IDs and their bottom-nav order ──
+  const screens   = ['home','reader','research','ai','donate','settings'];
+  // Maps screen ID → index in the bottom-nav button list
+  const navIndex  = {home:0, research:1, ai:2, donate:3, settings:4};
+  // Top tab bar labels (matches textContent of .screen-tab buttons)
+  const tabLabels = {home:'Kandas', reader:'Reader', research:'Research',
+                     ai:'AI Guide', donate:'Support', settings:'Settings'};
+
+  // ── Master switch: activate a screen and sync ALL nav elements ──
+  function switchScreen(id, topTabBtn) {
+    // 1. Hide all screens, show target
+    screens.forEach(s => document.getElementById('screen-'+s).classList.remove('active'));
+    document.getElementById('screen-'+id).classList.add('active');
+
+    // 2. Sync top tab bar
+    document.querySelectorAll('.screen-tab').forEach(t => {
+      t.classList.toggle('active',
+        t.textContent.trim().includes(tabLabels[id] || ''));
+    });
+    if (topTabBtn) { // if called directly from a tab button, force it active
+      document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+      topTabBtn.classList.add('active');
+    }
+
+    // 3. Sync every bottom-nav in every screen
+    const idx = navIndex[id]; // undefined for 'reader' → no bottom-nav item active
+    document.querySelectorAll('.bottom-nav').forEach(nav => {
+      nav.querySelectorAll('.nav-item').forEach((btn, i) => {
+        btn.classList.toggle('active', i === idx);
+      });
+    });
+  }
+
+  // Convenience wrapper used by bottom-nav onclick handlers
+  function go(id) { switchScreen(id, null); }
+
+  // ── Kanda accordion ──
+  function toggleKanda(header) {
+    header.closest('.kanda-card').classList.toggle('open');
+  }
+
+  // ── Reader language tabs ──
+  function switchReaderTab(btn) {
+    btn.closest('.reader-tabs').querySelectorAll('.reader-tab')
+       .forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── Research filter chips ──
+  function setFilter(chip) {
+    chip.closest('.filter-chips').querySelectorAll('.filter-chip')
+        .forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  }
+
+  // ── Donation billing toggle ──
+  function switchBilling(btn, type) {
+    btn.closest('.billing-tabs').querySelectorAll('.billing-tab')
+       .forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tiers-one-time').style.display = type === 'one-time' ? '' : 'none';
+    document.getElementById('tiers-monthly').style.display  = type === 'monthly'  ? '' : 'none';
+  }
+
+  // ── Settings language selection ──
+  function selectLang(option) {
+    option.closest('.settings-card').querySelectorAll('.lang-option').forEach(o => {
+      o.classList.remove('selected');
+      // Find the icon span regardless of its current class name
+      const icon = o.querySelector('[class^="lang-"]');
+      if (icon) { icon.className = 'lang-circle'; icon.textContent = '○'; }
+    });
+    option.classList.add('selected');
+    // The icon might currently be lang-circle or lang-check — find it either way
+    const icon = option.querySelector('[class^="lang-"]');
+    if (icon) { icon.className = 'lang-check'; icon.textContent = '✔'; }
+  }
+
+  // ── Audio lang chips ──
+  function switchLangChip(chip) {
+    chip.closest('.audio-langs').querySelectorAll('.lang-chip')
+        .forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  }
+
+  // ── Audio play/pause toggle (uses data attribute, not emoji comparison) ──
+  function toggleAudio(btn) {
+    const playing = btn.dataset.playing === 'true';
+    btn.dataset.playing = String(!playing);
+    btn.textContent = playing ? '▶' : '⏸';
+  }
+
+  // ── Font size adjustment for Reader ──
+  let readerFontSize = 13; // matches CSS .verse-text font-size
+  function adjustFont(delta) {
+    readerFontSize = Math.min(20, Math.max(9, readerFontSize + delta));
+    document.querySelectorAll('.verse-text, .verse-translation').forEach(el => {
+      el.style.fontSize = readerFontSize + 'px';
+    });
+  }
+
+  // ── AI chat ──
+  const botReplies = [
+    "In the Ramayana, this concept is woven into the dharmic fabric. Valmiki uses it to show Rama's divine nature — present in all creation yet beyond it. 🙏",
+    "Excellent question! The sages understood this as a manifestation of cosmic order (Rta). Rama embodies it perfectly in both action and stillness. 🪷",
+    "This is one of the most profound themes in the Bala Kanda. True strength is not merely physical — it is born from devotion and righteousness. ✨",
+    "Valmiki describes this beautifully across several verses. The Sanskrit term carries layers of meaning: outer form, inner grace, and the divine will acting through human experience. 🌺"
+  ];
+  let replyIdx = 0;
+
+  function addMsg(text) {
+    const msgs = document.getElementById('chatMessages');
+    const u = document.createElement('div');
+    u.className = 'msg-bubble user';
+    u.innerHTML = `<div class="msg-role"><span>👤</span> Researcher</div><div class="msg-text">${text}</div>`;
+    msgs.appendChild(u);
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'msg-bubble bot';
+      b.innerHTML = `<div class="msg-role"><span>✨</span> Valmiki Guide</div><div class="msg-text">${botReplies[replyIdx++ % botReplies.length]}</div>`;
+      msgs.appendChild(b);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 700);
+  }
+
+  function sendChat() {
+    const inp = document.getElementById('chatInput');
+    const t = inp.value.trim();
+    if (!t) return;
+    inp.value = '';
+    addMsg(t);
+  }
+
+  // ── Init: set correct active state on page load ──
+  switchScreen('home', null);
+</script>
+</body>
+</html>

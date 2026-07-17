@@ -7,8 +7,8 @@ import '../services/content_service.dart';
 import '../theme.dart';
 
 class ReaderScreen extends ConsumerStatefulWidget {
-  final Chapter chapter;
-  const ReaderScreen({super.key, required this.chapter});
+  final Chapter? chapter;
+  const ReaderScreen({super.key, this.chapter});
 
   @override
   ConsumerState<ReaderScreen> createState() => _ReaderScreenState();
@@ -72,8 +72,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     super.dispose();
   }
 
+  Chapter get _chapter {
+    if (widget.chapter != null) return widget.chapter!;
+    final active = ref.read(activeChapterProvider);
+    if (active != null) return active;
+    final chapters = ref.read(chaptersListProvider).value;
+    if (chapters != null && chapters.isNotEmpty) return chapters.first;
+    throw Exception('No chapters loaded to read.');
+  }
+
   Future<void> _initAndPlayAudio() async {
-    final audioDetail = _audioLanguage == 'en' ? widget.chapter.audioEnglish : widget.chapter.audioBangla;
+    final audioDetail = _audioLanguage == 'en' ? _chapter.audioEnglish : _chapter.audioBangla;
 
     setState(() {
       _isAudioLoading = true;
@@ -113,16 +122,30 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final meta = widget.chapter.sourceMetadata;
+    
+    // Watch active chapter provider to rebuild UI when active chapter changes dynamically
+    final chapter = widget.chapter ?? ref.watch(activeChapterProvider) ?? ref.watch(chaptersListProvider).value?.first;
+    
+    if (chapter == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: AppTheme.saffronPrimary),
+        ),
+      );
+    }
+    
+    final meta = chapter.sourceMetadata;
 
     return Scaffold(
       backgroundColor: AppTheme.maroonBg,
       appBar: AppBar(
-        title: Text('${widget.chapter.kanda} - Chapter ${widget.chapter.chapterNumber}'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: Text('${chapter.kanda} - Chapter ${chapter.chapterNumber}'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         actions: [
           // Text scaling button
           IconButton(
@@ -137,8 +160,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           IconButton(
             icon: const Icon(Icons.auto_awesome_rounded, size: 18, color: AppTheme.goldAccent),
             onPressed: () {
-              ref.read(activeChapterProvider.notifier).state = widget.chapter;
-              Navigator.pop(context);
+              ref.read(activeChapterProvider.notifier).state = chapter;
+              if (Navigator.canPop(context)) Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: AppTheme.saffronPrimary,
@@ -165,11 +188,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildEnglishTab(meta),
-          _buildBanglaTab(meta),
-          _buildSpanishTab(l10n, meta),
-          _buildInsightsTab(l10n, meta),
-          _buildAudioTab(l10n),
+          _buildEnglishTab(chapter, meta),
+          _buildBanglaTab(chapter, meta),
+          _buildSpanishTab(chapter, l10n, meta),
+          _buildInsightsTab(chapter, l10n, meta),
+          _buildAudioTab(chapter, l10n),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -178,8 +201,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         icon: const Icon(Icons.auto_awesome_rounded),
         label: Text(l10n.readerAskAiGuide),
         onPressed: () {
-          ref.read(activeChapterProvider.notifier).state = widget.chapter;
-          Navigator.pop(context);
+          ref.read(activeChapterProvider.notifier).state = chapter;
+          if (Navigator.canPop(context)) Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: AppTheme.saffronPrimary,
@@ -191,31 +214,31 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildEnglishTab(SourceMetadata meta) {
+  Widget _buildEnglishTab(Chapter chapter, SourceMetadata meta) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.chapter.chapterTitleEnglish,
+            chapter.chapterTitleEnglish,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.softCreamText),
           ),
           const SizedBox(height: 16),
           Text(
-            widget.chapter.englishText,
+            chapter.englishText,
             style: TextStyle(fontSize: _fontSize, height: 1.6, color: AppTheme.softCreamText),
           ),
           const SizedBox(height: 40),
-          _buildSourceCard(meta, isBangla: false),
+          _buildSourceCard(chapter, meta, isBangla: false),
           const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildSpanishTab(AppLocalizations l10n, SourceMetadata meta) {
-    if (widget.chapter.spanishText.isEmpty) {
+  Widget _buildSpanishTab(Chapter chapter, AppLocalizations l10n, SourceMetadata meta) {
+    if (chapter.spanishText.isEmpty) {
       return Center(child: Text(l10n.readerSpanishNotLoaded, style: const TextStyle(color: AppTheme.textDimMaroon)));
     }
     return SingleChildScrollView(
@@ -224,9 +247,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.chapter.chapterTitleSpanish.isNotEmpty
-                ? widget.chapter.chapterTitleSpanish
-                : widget.chapter.chapterTitleEnglish,
+            chapter.chapterTitleSpanish.isNotEmpty
+                ? chapter.chapterTitleSpanish
+                : chapter.chapterTitleEnglish,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.goldAccent),
           ),
           const SizedBox(height: 16),
@@ -234,20 +257,20 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             padding: const EdgeInsets.all(16),
             decoration: AppTheme.devotionalCardDecoration(),
             child: Text(
-              widget.chapter.spanishText,
+              chapter.spanishText,
               style: TextStyle(fontSize: _fontSize, height: 1.6, color: AppTheme.softCreamText),
             ),
           ),
           const SizedBox(height: 40),
-          _buildSourceCard(meta, isBangla: false),
+          _buildSourceCard(chapter, meta, isBangla: false),
           const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildBanglaTab(SourceMetadata meta) {
-    if (widget.chapter.chapterTitleBangla.isEmpty) {
+  Widget _buildBanglaTab(Chapter chapter, SourceMetadata meta) {
+    if (chapter.chapterTitleBangla.isEmpty) {
       return const Center(child: Text('Bangla translation not loaded.'));
     }
 
@@ -257,7 +280,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.chapter.chapterTitleBangla,
+            chapter.chapterTitleBangla,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.goldAccent),
           ),
           const SizedBox(height: 16),
@@ -274,21 +297,21 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  widget.chapter.banglaText,
+                  chapter.banglaText,
                   style: TextStyle(fontSize: _fontSize, height: 1.6, color: AppTheme.softCreamText),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 40),
-          _buildSourceCard(meta, isBangla: true),
+          _buildSourceCard(chapter, meta, isBangla: true),
           const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildInsightsTab(AppLocalizations l10n, SourceMetadata meta) {
+  Widget _buildInsightsTab(Chapter chapter, AppLocalizations l10n, SourceMetadata meta) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -299,17 +322,17 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             title: l10n.readerEnglishSummary,
             icon: Icons.summarize_rounded,
             color: AppTheme.saffronPrimary,
-            content: widget.chapter.shortSummaryEnglish,
+            content: chapter.shortSummaryEnglish,
           ),
           const SizedBox(height: 16),
 
           // Bangla Summary Card
-          if (widget.chapter.shortSummaryBangla.isNotEmpty) ...[
+          if (chapter.shortSummaryBangla.isNotEmpty) ...[
             _buildInsightSection(
               title: 'সারসংক্ষেপ (Bangla Summary)',
               icon: Icons.short_text_rounded,
               color: AppTheme.goldAccent,
-              content: widget.chapter.shortSummaryBangla,
+              content: chapter.shortSummaryBangla,
             ),
             const SizedBox(height: 16),
           ],
@@ -319,16 +342,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             title: l10n.readerMoralLesson,
             icon: Icons.workspace_premium_rounded,
             color: AppTheme.goldAccent,
-            content: widget.chapter.moralLessonEnglish,
+            content: chapter.moralLessonEnglish,
           ),
           const SizedBox(height: 16),
 
-          if (widget.chapter.moralLessonBangla.isNotEmpty) ...[
+          if (chapter.moralLessonBangla.isNotEmpty) ...[
             _buildInsightSection(
               title: 'নৈতিক শিক্ষা (Bangla Moral)',
               icon: Icons.star_border_purple500_rounded,
               color: AppTheme.saffronPrimary,
-              content: widget.chapter.moralLessonBangla,
+              content: chapter.moralLessonBangla,
             ),
             const SizedBox(height: 24),
           ],
@@ -339,7 +362,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.chapter.characters.map((c) {
+            children: chapter.characters.map((c) {
               return Chip(
                 avatar: CircleAvatar(
                   backgroundColor: AppTheme.goldAccent.withValues(alpha: 0.2),
@@ -358,7 +381,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.chapter.themes.map((t) {
+            children: chapter.themes.map((t) {
               return Chip(
                 label: Text('#$t'),
                 backgroundColor: Colors.teal.withValues(alpha: 0.12),
@@ -367,7 +390,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             }).toList(),
           ),
           const SizedBox(height: 40),
-          _buildSourceCard(meta, isBangla: false),
+          _buildSourceCard(chapter, meta, isBangla: false),
           const SizedBox(height: 80),
         ],
       ),
@@ -396,7 +419,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildSourceCard(SourceMetadata meta, {required bool isBangla}) {
+  Widget _buildSourceCard(Chapter chapter, SourceMetadata meta, {required bool isBangla}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -413,11 +436,11 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDimMaroon),
           ),
           const SizedBox(height: 10),
-          _buildSourceText('Source Book:', widget.chapter.sourceTitle),
+          _buildSourceText('Source Book:', chapter.sourceTitle),
           _buildSourceText('Translator:', meta.authorTranslator),
           _buildSourceText('Publication Year:', meta.publicationYear?.toString() ?? '1891'),
-          _buildSourceText('Copyright Status:', widget.chapter.sourceStatus),
-          _buildSourceText('Review Status:', widget.chapter.reviewStatus),
+          _buildSourceText('Copyright Status:', chapter.sourceStatus),
+          _buildSourceText('Review Status:', chapter.reviewStatus),
           _buildSourceText('Approved By:', meta.reviewerName ?? 'SitaRam Team'),
           _buildSourceText('Approval Date:', meta.approvalDate ?? '2026-06-10'),
         ],
@@ -438,8 +461,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildAudioTab(AppLocalizations l10n) {
-    final audioDetail = _audioLanguage == 'en' ? widget.chapter.audioEnglish : widget.chapter.audioBangla;
+  Widget _buildAudioTab(Chapter chapter, AppLocalizations l10n) {
+    final audioDetail = _audioLanguage == 'en' ? chapter.audioEnglish : chapter.audioBangla;
     final isPlaceholder = audioDetail.status == 'placeholder';
 
     return SingleChildScrollView(
@@ -463,7 +486,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> with SingleTickerPr
           const SizedBox(height: 24),
 
           Text(
-            _audioLanguage == 'en' ? widget.chapter.chapterTitleEnglish : widget.chapter.chapterTitleBangla,
+            _audioLanguage == 'en' ? chapter.chapterTitleEnglish : chapter.chapterTitleBangla,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.softCreamText),
             textAlign: TextAlign.center,
           ),

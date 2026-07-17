@@ -1,0 +1,54 @@
+{
+  "documentId": "m_n_dutt_public_domain_yuddha_kanda_sarga_001",
+  "work": "Valmiki Ramayana",
+  "editionId": "m_n_dutt_public_domain",
+  "kandaId": "yuddha_kanda",
+  "kandaOrder": 1,
+  "kandaName": "Yuddha Kanda",
+  "sargaNumber": 1,
+  "sargaTitleEnglish": "Sarga 1",
+  "sargaTitleBangla": "",
+  "sargaTitleSpanish": "",
+  "sourceLanguage": "en",
+  "sourceText": "Rama built the bridge to Lanka, slew Ravana, rescued Sita, and returned to Ayodhya.",
+  "translations": {
+    "en": "Rama built the bridge to Lanka, slew Ravana, rescued Sita, and returned to Ayodhya.",
+    "bn": "",
+    "es": "",
+    "hi": "",
+    "sa": ""
+  },
+  "summary": {
+    "en": "",
+    "bn": "",
+    "es": ""
+  },
+  "moralLesson": {
+    "en": "",
+    "bn": "",
+    "es": ""
+  },
+  "characters": [],
+  "places": [],
+  "events": [],
+  "themes": [],
+  "relationships": [],
+  "keywords": [],
+  "contentType": "source_text",
+  "sourceMetadata": {
+    "sourceTitle": "Valmiki Ramayana",
+    "translator": "Manmatha Nath Dutt",
+    "publicationYear": 1891,
+    "copyrightStatus": "public_domain",
+    "sourceUrl": "https://archive.org/details/valmikiramayana",
+    "sourcePage": "",
+    "contentHash": ""
+  },
+  "review": {
+    "status": "raw_import",
+    "textReviewer": "",
+    "translationReviewer": "",
+    "reviewedAt": "",
+    "notes": ""
+  }
+}

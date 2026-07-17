@@ -22,6 +22,16 @@ class ContentService {
     }
   }
 
+  Future<Map<String, dynamic>> loadCoverageReport() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/content/coverage_report.json');
+      return json.decode(jsonString) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint("Error loading coverage report: $e");
+      return {};
+    }
+  }
+
   // Multi-index Search function
   List<Chapter> search({
     String query = '',
@@ -162,4 +172,9 @@ final searchResultsProvider = Provider<List<Chapter>>((ref) {
     },
     orElse: () => [],
   );
+});
+
+final coverageReportProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  final service = ref.watch(contentServiceProveder);
+  return await service.loadCoverageReport();
 });

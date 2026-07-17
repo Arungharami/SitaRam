@@ -2,15 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
+import '../services/content_service.dart';
 import '../theme.dart';
+import 'donation_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  // Displaying modal disclaimer dialogs
+  void _showInfoDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.cardBgMaroon,
+          title: Text(title, style: const TextStyle(color: AppTheme.goldAccent, fontSize: 18, fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Text(content, style: const TextStyle(color: AppTheme.softCreamText, fontSize: 13, height: 1.5)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close', style: TextStyle(color: AppTheme.saffronPrimary)),
+            )
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
+    final coverageAsync = ref.watch(coverageReportProvider);
 
     final languages = [
       {'code': 'en', 'native': 'English'},
@@ -48,6 +73,69 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // Real-time Corpus Coverage status
+          _sectionHeader('CORPUS COVERAGE STATUS'),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: AppTheme.devotionalCardDecoration(),
+            child: coverageAsync.when(
+              data: (report) {
+                final imported = report['sargasImported'] ?? 0;
+                final expected = report['sargasExpected'] ?? 645;
+                final pct = report['languages']?[currentLocale.languageCode]?['coveragePercent'] ?? 0.0;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sargas Imported: $imported / $expected',
+                      style: const TextStyle(color: AppTheme.softCreamText, fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Edition: Manmatha Nath Dutt (Public Domain)',
+                      style: const TextStyle(color: AppTheme.textDimMaroon, fontSize: 11),
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: (imported / expected).clamp(0.0, 1.0),
+                        backgroundColor: Colors.white10,
+                        color: AppTheme.saffronPrimary,
+                        minHeight: 6,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Translation Coverage: $pct%',
+                      style: const TextStyle(color: AppTheme.goldAccent, fontSize: 12),
+                    ),
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.saffronPrimary)),
+              error: (_, __) => const Text('Failed to load coverage report.', style: TextStyle(color: Colors.redAccent)),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          _sectionHeader('SUPPORT THE PROJECT'),
+          Container(
+            decoration: AppTheme.devotionalCardDecoration(),
+            child: ListTile(
+              leading: const Icon(Icons.favorite_rounded, color: Colors.redAccent),
+              title: const Text('Donate & Support Seva', style: TextStyle(color: AppTheme.softCreamText)),
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DonationScreen()),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+
           _sectionHeader(l10n.settingsAbout),
           Container(
             padding: const EdgeInsets.all(16),
@@ -78,22 +166,64 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          _sectionHeader('LEGAL & TRUST INFO'),
           Container(
             decoration: AppTheme.devotionalCardDecoration(),
             child: Column(
               children: [
                 ListTile(
+                  leading: const Icon(Icons.info_outline, color: AppTheme.goldAccent),
+                  title: const Text('AI Disclaimer', style: TextStyle(color: AppTheme.softCreamText)),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
+                  onTap: () => _showInfoDialog(
+                    context, 
+                    'AI Disclaimer', 
+                    'SitaRam AI Guide is an educational study assistant. AI-generated responses are derived from RAG contexts and are for learning and reference only. They do not constitute official religious authority, scriptural rulings, or divine instructions. Please cross-reference responses with traditional commentaries.'
+                  ),
+                ),
+                const Divider(color: Colors.white10, height: 1),
+                ListTile(
+                  leading: const Icon(Icons.copyright_rounded, color: AppTheme.goldAccent),
+                  title: const Text('Source & Copyright Info', style: TextStyle(color: AppTheme.softCreamText)),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
+                  onTap: () => _showInfoDialog(
+                    context, 
+                    'Source & Copyright', 
+                    'The primary source used in the SitaRam application is the translation of the Valmiki Ramayana by Manmatha Nath Dutt, originally published in 1891 and now in the public domain. All summaries and moral insights are human-reviewed to match exact canonical Sargas.'
+                  ),
+                ),
+                const Divider(color: Colors.white10, height: 1),
+                ListTile(
+                  leading: const Icon(Icons.translate_rounded, color: AppTheme.goldAccent),
+                  title: const Text('Translation Disclaimer', style: TextStyle(color: AppTheme.softCreamText)),
+                  trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
+                  onTap: () => _showInfoDialog(
+                    context, 
+                    'Translation Disclaimer', 
+                    'Scriptural translations may vary across different traditions and editions. The translations provided inside the SitaRam application (English, Bengali, Spanish) are intended for study assistance and do not represent the only authoritative readings.'
+                  ),
+                ),
+                const Divider(color: Colors.white10, height: 1),
+                ListTile(
                   leading: const Icon(Icons.privacy_tip_outlined, color: AppTheme.goldAccent),
                   title: Text(l10n.settingsPrivacyPolicy, style: const TextStyle(color: AppTheme.softCreamText)),
                   trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
-                  onTap: () {},
+                  onTap: () => _showInfoDialog(
+                    context, 
+                    'Privacy Policy', 
+                    'SitaRam respects your privacy. All reflection notes, bookmark details, and study stats are stored locally on your device. We do not track or sell your reading habits.'
+                  ),
                 ),
                 const Divider(color: Colors.white10, height: 1),
                 ListTile(
                   leading: const Icon(Icons.description_outlined, color: AppTheme.goldAccent),
                   title: Text(l10n.settingsTerms, style: const TextStyle(color: AppTheme.softCreamText)),
                   trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppTheme.textDimMaroon),
-                  onTap: () {},
+                  onTap: () => _showInfoDialog(
+                    context, 
+                    'Terms of Service', 
+                    'By using SitaRam, you agree to use the educational resources for personal, devotional, and study purposes only. Content scraping or abuse of RAG servers is prohibited.'
+                  ),
                 ),
               ],
             ),
@@ -105,6 +235,7 @@ class SettingsScreen extends ConsumerWidget {
               style: TextStyle(color: AppTheme.textDimMaroon, fontSize: 13),
             ),
           ),
+          const SizedBox(height: 40),
         ],
       ),
     );

@@ -1,7 +1,13 @@
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// ─── Load signing credentials from key.properties (never commit this file) ───
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = java.util.Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
 android {
@@ -14,22 +20,56 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // ─── Signing Configurations ───────────────────────────────────────────────
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias     = keystoreProperties["keyAlias"]     as String
+                keyPassword  = keystoreProperties["keyPassword"]  as String
+                storeFile    = file(keystoreProperties["storeFile"] as String)
+                storePassword= keystoreProperties["storePassword"] as String
+            }
+        }
+    }
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.leadai.sitaram"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+
+        // just_audio requires minSdk 21; target latest stable API
+        minSdk    = 21
+        targetSdk = 35
+
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Optimise APK size — keep only the most common ABIs
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
     }
 
     buildTypes {
+        // ── Debug (unchanged) ────────────────────────────────────────────────
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix   = "-debug"
+        }
+
+        // ── Release (production) ─────────────────────────────────────────────
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePropertiesFile.exists())
+                signingConfigs.getByName("release")
+            else
+                signingConfigs.getByName("debug") // fallback for CI without key
+
+            // Enable R8 shrinking & resource stripping
+            isMinifyEnabled   = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

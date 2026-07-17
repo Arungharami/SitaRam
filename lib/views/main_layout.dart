@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/content_service.dart';
 import '../theme.dart';
 import 'home_screen.dart';
+import 'reader_screen.dart';
 import 'research_dashboard.dart';
 import 'ai_chat_screen.dart';
-import 'donation_screen.dart';
 import 'settings_screen.dart';
 
 class MainLayout extends ConsumerStatefulWidget {
@@ -41,6 +41,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
     final List<Widget> tabs = [
       const HomeScreen(),
+      const ReaderScreen(),
       const ResearchDashboard(),
       activeChapter != null
           ? AiChatScreen(chapter: activeChapter)
@@ -49,7 +50,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                 child: CircularProgressIndicator(color: AppTheme.saffronPrimary),
               ),
             ),
-      const DonationScreen(),
       const SettingsScreen(),
     ];
 
@@ -69,24 +69,24 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         unselectedLabelStyle: const TextStyle(fontSize: 10),
         items: const [
           BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.chrome_reader_mode_outlined),
             activeIcon: Icon(Icons.chrome_reader_mode_rounded),
-            label: 'Kandas',
+            label: 'Read',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore_outlined),
             activeIcon: Icon(Icons.explore_rounded),
-            label: 'Research',
+            label: 'Explore',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.auto_awesome_outlined),
             activeIcon: Icon(Icons.auto_awesome_rounded),
             label: 'AI Guide',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline_rounded),
-            activeIcon: Icon(Icons.favorite_rounded),
-            label: 'Support',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
