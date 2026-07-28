@@ -44,28 +44,29 @@ def main():
     parser.add_argument("--output-dir", type=str, default="data/pages", help="Output folder to store extracted pages.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), args.output_dir))
+    os.makedirs(output_dir, exist_ok=True)
 
     print("[Step 1] Initializing PDF Import Pipeline (Professional Upgrade)...")
     
     if args.pdf:
         if not os.path.exists(args.pdf):
             print(f"Error: PDF file '{args.pdf}' not found. Falling back to bootstrap sample data.")
-            bootstrap_samples(args.output_dir)
+            bootstrap_samples(output_dir)
         else:
             try:
                 import pypdf
                 print(f"Extracting text from PDF: {args.pdf}")
-                extract_pdf_pages(args.pdf, args.output_dir)
+                extract_pdf_pages(args.pdf, output_dir)
             except ImportError:
                 print("Warning: 'pypdf' package not installed. Cannot extract text directly.")
                 print("Falling back to bootstrap sample data to demonstrate the pipeline.")
-                bootstrap_samples(args.output_dir)
+                bootstrap_samples(output_dir)
     else:
         print("No PDF specified. Bootstrapping with Valmiki Ramayana sample pages...")
-        bootstrap_samples(args.output_dir)
+        bootstrap_samples(output_dir)
 
-    print(f"[Step 1] PDF Import complete. Pages are in '{args.output_dir}'.")
+    print(f"[Step 1] PDF Import complete. Pages are in '{output_dir}'.")
 
 def bootstrap_samples(output_dir):
     for sp in SAMPLE_PAGES:

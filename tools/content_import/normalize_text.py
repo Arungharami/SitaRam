@@ -25,7 +25,7 @@ def main():
     parser.add_argument("--sargas-dir", type=str, default="data/sargas", help="Folder containing raw sarga text files.")
     args = parser.parse_args()
     
-    sargas_path = os.path.join(os.path.dirname(__file__), args.sargas-dir if not os.path.isabs(args.sargas-dir) else args.sargas-dir)
+    sargas_path = os.path.abspath(os.path.join(os.path.dirname(__file__), args.sargas_dir))
     pattern = os.path.join(sargas_path, "*.txt")
     files = glob.glob(pattern)
     

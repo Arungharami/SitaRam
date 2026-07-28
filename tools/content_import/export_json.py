@@ -13,7 +13,10 @@ def main():
 
     print("[Step 5] Compiling and merging Ramayana chapters...")
     
-    en_pattern = os.path.join(args.chapters_dir, "en_*.json")
+    chapters_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), args.chapters_dir))
+    output_file = os.path.abspath(os.path.join(os.path.dirname(__file__), args.output_file))
+    
+    en_pattern = os.path.join(chapters_dir, "en_*.json")
     en_files = sorted(glob.glob(en_pattern))
     
     if not en_files:
@@ -25,7 +28,7 @@ def main():
     for en_file in en_files:
         base_name = os.path.basename(en_file)
         chapter_id = base_name.replace("en_", "").replace(".json", "")
-        bn_file = os.path.join(args.chapters_dir, f"bn_{chapter_id}.json")
+        bn_file = os.path.join(chapters_dir, f"bn_{chapter_id}.json")
         
         with open(en_file, 'r', encoding='utf-8') as f:
             en_data = json.load(f)
@@ -69,12 +72,16 @@ def main():
             "chapterNumber": en_data.get("chapter_number"),
             "chapterTitleEnglish": en_data.get("chapter_title_english"),
             "chapterTitleBangla": en_data.get("chapter_title_bangla"),
+            "chapterTitleSpanish": en_data.get("chapter_title_spanish", ""),
             "englishText": en_data.get("english_text"),
             "banglaText": bn_data.get("bangla_text", ""),
+            "spanishText": en_data.get("spanish_text", ""),
             "shortSummaryEnglish": en_data.get("short_summary_english"),
             "shortSummaryBangla": bn_data.get("short_summary_bangla", ""),
+            "shortSummarySpanish": en_data.get("short_summary_spanish", ""),
             "moralLessonEnglish": en_data.get("moral_lesson_english"),
             "moralLessonBangla": bn_data.get("moral_lesson_bangla", ""),
+            "moralLessonSpanish": en_data.get("moral_lesson_spanish", ""),
             "characters": en_data.get("characters", []),
             "themes": en_data.get("themes", []),
             
@@ -94,14 +101,14 @@ def main():
         print(f"Merged & Compiled: {chapter_id}")
 
     # Ensure output folder
-    output_dir = os.path.dirname(args.output_file)
+    output_dir = os.path.dirname(output_file)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
 
-    with open(args.output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(compiled_chapters, f, indent=2, ensure_ascii=False)
 
-    print(f"[Step 5] Finished. Exported {len(compiled_chapters)} chapters to '{args.output_file}'.")
+    print(f"[Step 5] Finished. Exported {len(compiled_chapters)} chapters to '{output_file}'.")
 
 if __name__ == "__main__":
     main()

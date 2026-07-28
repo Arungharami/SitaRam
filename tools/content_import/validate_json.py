@@ -33,15 +33,15 @@ def main():
     parser = argparse.ArgumentParser(description="Validate production Ramayana JSON schema.")
     parser.add_argument("--file", type=str, default="../../assets/content/ramayana_chapters.json", help="Path to JSON file.")
     args = parser.parse_args()
-
-    if not os.path.exists(args.file):
-        print(f"Error: File '{args.file}' does not exist.")
+    file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), args.file))
+    if not os.path.exists(file_path):
+        print(f"Error: File '{file_path}' does not exist.")
         sys.exit(1)
 
-    print(f"Validating production JSON: {args.file}")
+    print(f"Validating production JSON: {file_path}")
     
     try:
-        with open(args.file, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
         print(f"Error: Not valid JSON. {e}")

@@ -1,0 +1,38 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Yuddha Kanda",
+  "kandaId": "yuddha_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "The Great War",
+  "chapter_title_bangla": "লঙ্কা যুদ্ধ",
+  "english_text": "Rama led the monkey army to the shores of the southern ocean. To cross the sea, they constructed a miraculous bridge of stones, the Rama Setu. The army marched into Lanka, leading to a colossal war between Rama's forces and Ravana's demons. Rama slew Ravana in battle, rescued Sita, and returned to Ayodhya in glory.",
+  "short_summary_english": "Rama builds the sea bridge to Lanka, defeats Ravana, rescues Sita, and returns to Ayodhya.",
+  "moral_lesson_english": "Good ultimately triumphs over evil. No matter how strong injustice appears, righteousness (dharma) prevails.",
+  "characters": [
+    "Rama",
+    "Sita",
+    "Ravana",
+    "Sugriva",
+    "Hanuman",
+    "Lakshmana"
+  ],
+  "themes": [
+    "triumph",
+    "war",
+    "justice"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

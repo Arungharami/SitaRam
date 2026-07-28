@@ -30,7 +30,8 @@ def main():
 
     print("[Step 3] Cleaning OCR text and headers...")
     
-    pattern = os.path.join(args.pages_dir, "page_*.json")
+    pages_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), args.pages_dir))
+    pattern = os.path.join(pages_dir, "page_*.json")
     files = sorted(glob.glob(pattern))
 
     if not files:

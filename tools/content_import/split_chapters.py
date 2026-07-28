@@ -5,52 +5,52 @@ import json
 import re
 import argparse
 
-# Pre-populated high-quality content database for the 6 bootstrap chapters
+## Pre-populated high-quality content database for the Ramayana chapters
 CHAPTERS_DB = {
     1: {
         "kanda": "Bala Kanda",
         "kandaId": "bala_kanda",
         "chapterNumber": 1,
-        "chapterTitleEnglish": "Valmiki and Narada",
-        "chapterTitleBangla": "বাল্মীকি এবং নারদ",
-        "englishText": "The ascetic Valmiki asked Narada, the chief of sages, pre-eminent in virtuous learning: 'Who is there in the world today who is righteous, heroic, and truthful?' Narada, who knows the events of all three worlds, heard Valmiki's words and replied with joy: 'Listen, I will tell you of a man who possesses all these rare qualities, born in the Ikshvaku line, named Rama. Rama is self-controlled, powerful, radiant, a defender of dharma, and a helper of all living beings.'",
-        "banglaText": "মহর্ষি বাল্মীকি নারদকে জিজ্ঞাসা করলেন যে জগতে সর্বগুণসম্পন্ন আদর্শ মানুষ কে। নারদ রামচন্দ্রের মহিমাকীর্তন করলেন এবং তাঁর জীবনের মূল ঘটনাগুলো বর্ণনা করলেন। নারদ-বাল্মীকির এই কথোপকথন রামায়ণের মূল ভিত্তি। এতে রামের ধার্মিকতা, সত্যনিষ্ঠা এবং বীরত্বের কথা বলা হয়েছে।",
-        "shortSummaryEnglish": "Valmiki inquires about the ideal righteous man, and Narada reveals the virtues of Sri Rama.",
-        "shortSummaryBangla": "মহর্ষি বাল্মীকি আদর্শ মানুষ সম্পর্কে জানতে চাইলে নারদ রামের গুণাবলী বর্ণনা করেন।",
-        "moralLessonEnglish": "Dharma is the foundation of character. Truthfulness and self-control are the ultimate strengths.",
-        "moralLessonBangla": "ধর্ম হলো চরিত্রের ভিত্তি। সত্যনিষ্ঠা এবং আত্মসংযমই মানুষের আসল শক্তি।",
-        "characters": ["Valmiki", "Narada", "Rama"],
-        "themes": ["dharma", "virtue", "truth"]
+        "chapterTitleEnglish": "The Birth of Rama",
+        "chapterTitleBangla": "রামের জন্ম",
+        "englishText": "King Dasaratha of Ayodhya performed the Putrakameshti sacrifice. Lord Vishnu incarnated as Rama, born to Queen Kausalya, while Bharata, Lakshmana, and Shatrughna were born to Kaikeyi and Sumitra. The four princes grew up radiant in virtue and wisdom.",
+        "banglaText": "অযোধ্যার রাজা দশরথ পুত্রকামেষ্টি যজ্ঞ করেন। ভগবান বিষ্ণু শ্রীরামচন্দ্র রূপে মাতা কৌশল্যার গর্ভে জন্মগ্রহণ করেন। একই সাথে ভরত, লক্ষণ ও শত্রুঘ্ন জন্মগ্রহণ করেন। চার রাজকুমার সত্য ও ধর্মের শিক্ষায় বড় হয়ে ওঠেন।",
+        "shortSummaryEnglish": "King Dasaratha performs the sacred sacrifice, and Sri Rama is born in Ayodhya.",
+        "shortSummaryBangla": "রাজা দশরথের পুত্রকামেষ্টি যজ্ঞের ফলে শ্রীরামচন্দ্র ও তাঁর ভাইদের শুভ জন্ম হয়।",
+        "moralLessonEnglish": "Devotion and righteousness bring divine grace and fulfillment of noble desires.",
+        "moralLessonBangla": "ভক্তি ও ধার্মিকতা সকল সৎ ইচ্ছা পূরণ করে এবং ঈশ্বরাশীর্বাদ নিয়ে আসে।",
+        "characters": ["Dasaratha", "Rama", "Kausalya", "Lakshmana", "Bharata", "Shatrughna"],
+        "themes": ["divine_incarnation", "birth", "dharma"]
     },
     2: {
         "kanda": "Bala Kanda",
         "kandaId": "bala_kanda",
         "chapterNumber": 2,
-        "chapterTitleEnglish": "The Birth of Verse",
-        "chapterTitleBangla": "শ্লোক সৃষ্টি",
-        "englishText": "Valmiki went to the banks of the river Tamasa, accompanied by his disciple Bharadwaja. He beheld a pair of Krauncha birds singing sweetly. Suddenly, a wicked hunter killed the male bird. The female bird wailed in intense grief. Seeing this cruelty, Valmiki was moved to deep compassion and uttered a verse: 'Ma Nishada...' - which became the first shloka (verse) of Sanskrit literature, transforming sorrow into song.",
-        "banglaText": "বাল্মীকি তমসা নদীর তীরে একটি ক্রৌঞ্চ পাখী জোড়া দেখতে পান। এক ব্যাধ পুরুষ পাখীটিকে হত্যা করলে বাল্মীকি শোকাহত ও ক্রুদ্ধ হয়ে অভিশাপ দেন, যা প্রথম সংস্কৃত শ্লোক হিসেবে আত্মপ্রকাশ করে। এই শোক থেকেই মহাকাব্যের ছন্দোবদ্ধ শ্লোকের সৃষ্টি হয়।",
-        "shortSummaryEnglish": "Moved by the death of a Krauncha bird, Valmiki utters a curse that becomes the first poetic verse.",
-        "shortSummaryBangla": "ক্রৌঞ্চ পক্ষীর মৃত্যুতে শোকাবিষ্ট হয়ে মহর্ষি বাল্মীকি প্রথম সংস্কৃত শ্লোক উচ্চারণ করেন।",
-        "moralLessonEnglish": "Compassion for all living beings is the root of poetry and righteousness.",
-        "moralLessonBangla": "সকল জীবের প্রতি করুণা ও সহানুভূতিই হলো ধর্ম ও সৃজনশীলতার মূল উৎস।",
-        "characters": ["Valmiki", "Bharadwaja"],
-        "themes": ["compassion", "poetry", "dharma"]
+        "chapterTitleEnglish": "Sage Vishwamitra's Request",
+        "chapterTitleBangla": "বিশ্বামিত্রের প্রার্থনা",
+        "englishText": "The great sage Vishwamitra arrived at Dasaratha's court to request young Rama's help in protecting his yajna from demons Taraka, Maricha, and Subahu. Accompanied by Lakshmana, young Rama defeated the demons, displaying supreme valor and righteousness.",
+        "banglaText": "মহর্ষি বিশ্বামিত্র রাজা দশরথের দরবারে এসে রাক্ষস তারকা ও মারীচের উপদ্রব থেকে যজ্ঞ রক্ষার জন্য তরুণ রামকে চান। রাম ও লক্ষণ বিশ্বামিত্রের সাথে গিয়ে রাক্ষসদের নিধন করেন এবং যজ্ঞ রক্ষা করেন।",
+        "shortSummaryEnglish": "Rama and Lakshmana accompany Sage Vishwamitra and protect his sacred sacrifice from demons.",
+        "shortSummaryBangla": "শ্রীরাম ও লক্ষণ মহর্ষি বিশ্বামিত্রের সাথে গিয়ে রাক্ষস বিনাশ করে যজ্ঞ রক্ষা করেন।",
+        "moralLessonEnglish": "Courage in duty protects sacred wisdom and cosmic harmony.",
+        "moralLessonBangla": "কর্তব্য পালনে সাহসিকতা মহৎ কাজ ও সত্যকে রক্ষা করে।",
+        "characters": ["Rama", "Lakshmana", "Vishwamitra", "Taraka", "Maricha"],
+        "themes": ["valor", "protection", "duty"]
     },
     3: {
         "kanda": "Bala Kanda",
         "kandaId": "bala_kanda",
         "chapterNumber": 3,
-        "chapterTitleEnglish": "The Great Theme",
-        "chapterTitleBangla": "মহাকাব্যের সূচনা",
-        "englishText": "Lord Brahma appeared before Valmiki and blessed him, saying: 'Write the complete history of Rama. As long as mountains stand and rivers flow, the story of Ramayana will be remembered.' Valmiki sat in deep meditation and beheld the entire history of Rama, Lakshmana, and Sita as clearly as a fruit on his palm, and began composing the epic.",
-        "banglaText": "ব্রহ্মার আদেশে বাল্মীকি রামের সমগ্র ইতিহাস রচনায় ব্রতী হন। তিনি ধ্যানে বসে রাম, লক্ষণ ও সীতার সমস্ত জীবনধারা করামলকবৎ স্পষ্ট দেখতে পান এবং রামায়ণ মহাকাব্য রচনা আরম্ভ করেন। ব্রহ্মা বর দেন যে যতদিন পর্বত ও নদী থাকবে, ততদিন রামায়ণ পৃথিবীতে পঠিত হবে।",
-        "shortSummaryEnglish": "Brahma commands Valmiki to write the epic, and Valmiki sees the entire Ramayana in meditation.",
-        "shortSummaryBangla": "ব্রহ্মার আদেশে বাল্মীকি রামায়ণ রচনা করেন এবং ধ্যানের মাধ্যমে রামের জীবন প্রত্যক্ষ করেন।",
-        "moralLessonEnglish": "Divine inspiration guides those who act with a pure heart and compassion.",
-        "moralLessonBangla": "পবিত্র হৃদয় ও পরোপকারী মনোভাবের অধিকারী ব্যক্তিরাই ঈশ্বরের আশীর্বাদ লাভ করেন।",
-        "characters": ["Valmiki", "Brahma", "Rama"],
-        "themes": ["divine_command", "destiny", "inspiration"]
+        "chapterTitleEnglish": "Sita Swayamvar",
+        "chapterTitleBangla": "সীতার স্বয়ংবর",
+        "englishText": "Sage Vishwamitra brought Rama and Lakshmana to Mithila for King Janaka's Swayamvar. Rama easily lifted and strung the formidable bow of Lord Shiva, breaking it in the process. Princess Sita chose Rama as her husband, and they were wedded in royal splendour.",
+        "banglaText": "মহর্ষি বিশ্বামিত্র রাম ও লক্ষণকে মিথিলায় রাজা জনকের রাজসভায় নিয়ে যান। রাম অবলীলায় দেবাদিদেব শিবের ধনুক উত্তোলন ও গুণ পরিয়ে তা ভঙ্গ করেন। রাজকুমারী সীতা রামের গলায় বরমাল্য প্রদান করেন।",
+        "shortSummaryEnglish": "Rama breaks Shiva's bow at Mithila and weds Princess Sita in divine union.",
+        "shortSummaryBangla": "শ্রীরামচন্দ্র শিবধনু ভঙ্গ করে মিথিলার রাজকুমারী সীতাকে বিবাহ করেন।",
+        "moralLessonEnglish": "Humility paired with spiritual strength overcomes insurmountable challenges.",
+        "moralLessonBangla": "নম্রতা ও আত্মিক শক্তি যেকোনো কঠিন বাঁধাকেও জয় করতে পারে।",
+        "characters": ["Rama", "Sita", "Janaka", "Vishwamitra", "Lakshmana"],
+        "themes": ["marriage", "divine_union", "strength"]
     },
     4: {
         "kanda": "Ayodhya Kanda",
@@ -58,23 +58,38 @@ CHAPTERS_DB = {
         "chapterNumber": 1,
         "chapterTitleEnglish": "Rama's Exile",
         "chapterTitleBangla": "রামের বনবাস",
-        "englishText": "King Dasaratha resolved to crown Rama as the crown prince. However, Queen Kaikeyi, instigated by her maid Manthara, demanded two boons: that her son Bharata be crowned and Rama be exiled to the forest for fourteen years. To preserve his father's truth and honor, Rama accepted the exile cheerfully, preparing to leave Ayodhya with Sita and Lakshmana.",
-        "banglaText": "রাজা দশরথ রামের রাজ্যাভিষেকের সিদ্ধান্ত নেন। কিন্তু মন্থরার প্ররোচনায় রানী কৈকেয়ী দশরথের কাছে রামের চোদ্দ বছরের বনবাস এবং ভরতের রাজ্যাভিষেক দাবি করেন। পিতার প্রতিজ্ঞা রক্ষা করতে রাম সানন্দে বনবাসের আদেশ মেনে নেন।",
+        "englishText": "King Dasaratha resolved to crown Rama as crown prince. However, Queen Kaikeyi, influenced by Manthara, demanded Bharata's coronation and Rama's 14-year forest exile. To preserve his father's vow, Rama cheerfully departed Ayodhya with Sita and Lakshmana.",
+        "banglaText": "রাজা দশরথ রামের রাজ্যাভিষেকের সিদ্ধান্ত নেন। কিন্তু মন্থরার প্ররোচনায় কৈকেয়ী ভরতকে রাজা করা এবং রামকে ১৪ বছরের বনবাসে পাঠানোর বর চান। পিতার সত্য রক্ষায় রাম সানন্দে সীতা ও লক্ষণকে নিয়ে বনে যান।",
         "shortSummaryEnglish": "Queen Kaikeyi demands Rama's exile, and Rama cheerfully accepts to uphold his father's word.",
-        "shortSummaryBangla": "কৈকেয়ীর দাবির মুখে পিতার সত্য রক্ষার জন্য রাম সানন্দে চৌদ্দ বছরের বনবাস মেনে নেন।",
-        "moralLessonEnglish": "Fulfilling filial duty (pitru-dharma) stands above personal ambition and comfort.",
-        "moralLessonBangla": "ব্যক্তিগত ভোগ ও উচ্চাকাঙ্ক্ষার চেয়ে পিতামাতার প্রতি কর্তব্য পালন করা শ্রেয়।",
+        "shortSummaryBangla": "পিতার প্রতিজ্ঞা রক্ষা করতে রাম সানন্দে চৌদ্দ বছরের বনবাস মেনে নেন।",
+        "moralLessonEnglish": "Filial duty and truth stand higher than kingdom or royal comfort.",
+        "moralLessonBangla": "পিতামাতার প্রতি কর্তব্য ও সত্য রক্ষা সমস্ত রাজ্যসুখের চেয়ে বড়।",
         "characters": ["Rama", "Dasaratha", "Kaikeyi", "Sita", "Lakshmana"],
         "themes": ["filial_duty", "sacrifice", "dharma"]
     },
     5: {
+        "kanda": "Ayodhya Kanda",
+        "kandaId": "ayodhya_kanda",
+        "chapterNumber": 2,
+        "chapterTitleEnglish": "Bharata's Devotion & Paduka Rule",
+        "chapterTitleBangla": "ভরতের ভক্তি ও পাদুকা রাজত্ব",
+        "englishText": "Upon learning of Rama's exile, Bharata renounced the throne and traveled to Chitrakoot to beg Rama to return. Rama refused to break his father's vow. Bharata placed Rama's sacred sandals (Padukas) on the throne and ruled Ayodhya as his humble regent from Nandigram.",
+        "banglaText": "রামের বনবাসের খবর পেয়ে ভরত সিংহাসন প্রত্যাখ্যান করে চিত্রকূটে গিয়ে রামকে ফিরে আসতে অনুরোধ করেন। রাম পিতার সত্য ভাঙতে অস্বীকার করলে ভরত রামের খড়ম বা পাদুকা সিংহাসনে রেখে নন্দীগ্রাম থেকে রাজকার্য পরিচালনা করেন।",
+        "shortSummaryEnglish": "Bharata places Rama's sandals on the throne of Ayodhya and rules as his regent.",
+        "shortSummaryBangla": "ভরত রামের চরণপাদুকা সিংহাসনে স্থাপন করে রামের প্রতিনিধি হয়ে অযোধ্যা শাসন করেন।",
+        "moralLessonEnglish": "Brotherly love and selfless devotion eclipse power and greed.",
+        "moralLessonBangla": "ভ্যাত্রিস্নেহ ও নিঃস্বার্থ ভক্তি ক্ষমতা ও লোভকে পরাস্ত করে।",
+        "characters": ["Bharata", "Rama", "Lakshmana", "Sita"],
+        "themes": ["brotherly_love", "devotion", "regency"]
+    },
+    6: {
         "kanda": "Aranya Kanda",
         "kandaId": "aranya_kanda",
         "chapterNumber": 1,
         "chapterTitleEnglish": "Sita's Abduction",
+        "chapterTitleBangla": "সীতার হরণ",
         "englishText": "In the Panchavati forest, the demon king Ravana plotted to kidnap Sita. He sent Maricha in the guise of a golden deer. Rama went to chase the deer, followed by Lakshmana. Ravana, disguised as an ascetic, approached Sita's cottage, forcibly carried her away in his aerial chariot towards Lanka, while Sita cried out for help.",
         "banglaText": "পঞ্চবটী বনে রাক্ষসরাজ রাবণ সীতাকে অপহরণের পরিকল্পনা করে। সে মারীচকে সোনার হরিণ সাজিয়ে পাঠায়। রাম ও লক্ষণ হরিণের খোঁজে গেলে ছদ্মবেশী রাবণ কুটিরে এসে সীতাকে বলপূর্বক হরণ করে পুষ্পক রথে তুলে লঙ্কার উদ্দেশ্যে রওনা দেয়।",
-        "chapterTitleBangla": "সীতা হরণ",
         "shortSummaryEnglish": "Ravana deceives Rama and Lakshmana with a golden deer and forcibly abducts Sita from Panchavati.",
         "shortSummaryBangla": "রাবণ ছদ্মবেশ ধারণ করে সোনার হরিণের ফাঁদে ফেলে সীতাকে পঞ্চবটী বন থেকে হরণ করে।",
         "moralLessonEnglish": "Desire for illusions (the golden deer) leads to grief. Dharma protects only when vigilance is kept.",
@@ -82,20 +97,78 @@ CHAPTERS_DB = {
         "characters": ["Rama", "Sita", "Ravana", "Maricha", "Lakshmana"],
         "themes": ["deception", "abduction", "vigilance"]
     },
-    6: {
-        "kanda": "Sundara Kanda",
-        "kandaId": "sundara_kanda",
+    7: {
+        "kanda": "Kishkindha Kanda",
+        "kandaId": "kishkindha_kanda",
         "chapterNumber": 1,
-        "chapterTitleEnglish": "Hanuman's Devotion",
-        "chapterTitleBangla": "হনুমানের ভক্তি",
-        "englishText": "Hanuman, the mighty monkey commander, resolved to cross the southern ocean to locate Sita. Invoking the name of Lord Rama, he leapt from Mount Mahendra into the sky. Braving fierce monsters and ocean deities, his focus remained unbroken, driven by pure devotion and duty to his Lord.",
-        "banglaText": "সীতার খোঁজে মহাবীর হনুমান সমুদ্র পার হওয়ার সিদ্ধান্ত নেন। রামের নাম স্মরণ করে তিনি মহেন্দ্র পর্বত থেকে লম্ফ প্রদান করেন। পথে নানা প্রতিবন্ধকতা জয় করে ভক্তি ও কর্তব্যের শক্তিতে তিনি সফলভাবে লঙ্কায় পৌঁছান।",
-        "shortSummaryEnglish": "Hanuman leaps across the ocean to Lanka to search for Sita, overcoming obstacles with devotion.",
-        "shortSummaryBangla": "হনুমান লঙ্কার উদ্দেশ্যে সমুদ্র পাড়ি দেন এবং রামভক্তির শক্তিতে সমস্ত বাধা অতিক্রম করেন।",
-        "moralLessonEnglish": "Devotion (bhakti) makes the impossible possible. Faith can cross any ocean of difficulty.",
-        "moralLessonBangla": "ভক্তি ও নিষ্ঠা থাকলে যেকোনো বড় বাধা অতিক্রম করা যায়। বিশ্বাসের চেয়ে বড় কোনো শক্তি নেই।",
-        "characters": ["Hanuman", "Rama", "Sita"],
-        "themes": ["devotion", "faith", "courage"]
+        "chapterTitleEnglish": "Alliance with the Monkeys",
+        "chapterTitleBangla": "বানর রাজত্বে মৈত্রী",
+        "englishText": "Rama reached the Pampa lake, grieving for Sita. There he met Hanuman, the minister of Sugriva, the exiled monkey king. Sugriva and Rama formed a sacred alliance: Rama promised to help Sugriva regain his kingdom from his brother Vali, and Sugriva pledged the monkey army to search for Sita across the world.",
+        "banglaText": "সীতার শোকে কাতর রামচন্দ্র পম্পা সরোবরের তীরে পৌঁছান। সেখানে সুগ্রীবের অনুচর হনুমান রাম ও লক্ষ্মণের সাথে দেখা করেন এবং তাদের সুগ্রীবের কাছে নিয়ে যান। রাম ও সুগ্রীব অগ্নিলক্ষ্য করে মৈত্রী স্থাপন করেন। রাম বালী বধের এবং সুগ্রীব সীতার অনুসন্ধানের প্রতিজ্ঞা করেন।",
+        "shortSummaryEnglish": "Rama meets Hanuman and forms a sacred alliance with Sugriva to search for Sita.",
+        "shortSummaryBangla": "পম্পা তীরে রাম ও লক্ষ্মণ হনুমানের মাধ্যমে সুগ্রীবের সাথে সাক্ষাৎ করেন এবং পারস্পরিক সাহায্য ও সীতা খোঁজার প্রতিজ্ঞা করেন।",
+        "moralLessonEnglish": "True friendship is based on mutual support, trust, and alignment in righteousness (dharma).",
+        "moralL        "moralLessonBangla": "নিঃস্বার্থ সেবা ও সত্যের প্রতি অবিচল নিষ্ঠাই হলো সমাজে শান্তি ও কল্যাণ আনার একমাত্র উপায়।",
+        "characters": ["Rama", "Sita", "Valmiki", "Lava", "Kusha"],
+        "themes": ["ramarajya", "peace", "legacy"]
+    }
+}��ম্ভাবী। অসত্য যত শক্তিশালীই হোক না কেন, সত্যের জয় হবেই।",
+        "characters": ["Rama", "Sita", "Ravana", "Sugriva", "Hanuman", "Lakshmana"],
+        "themes": ["triumph", "war", "justice"]
+    },
+    10: {
+        "kanda": "Uttara Kanda",
+        "kandaId": "uttara_kanda",
+        "chapterNumber": 1,
+        "chapterTitleEnglish": "The Righteous Reign",
+        "chapterTitleBangla": "ধর্মরাজ্য প্রতিষ্ঠা",
+        "englishText": "Rama was crowned king of Ayodhya, establishing Ramarajya—a golden age of truth, prosperity, and peace. Lava and Kusha, the twin sons of Rama and Sita, grew up in Valmiki's hermitage and sang the sacred story of the Ramayana before Rama, completing the epic cycle.",
+        "banglaText": "অযোধ্যায় শ্রীরামচন্দ্রের রাজ্যাভিষেক হয় এবং রামরাজ্য প্রতিষ্ঠিত হয় যেখানে শান্তি ও সমৃদ্ধি বিরাজ করছিল। বাল্মীকির আশ্রমে রামের যমজ পুত্র লব ও কুশ জন্ম নেয়। তারা বাল্মীকির রচিত রামায়ণ গান গেয়ে শ্রীরামের দরবারে উপস্থিত করে।",
+        "shortSummaryEnglish": "Rama establishes a righteous reign in Ayodhya, and his sons Lava and Kusha sing the epic before him.",
+        "shortSummaryBangla": "শ্রীরামচন্দ্র অযোধ্যায় রামরাজ্য স্থাপন করেন। তাঁর দুই পুত্র লব ও কুশ তাঁরই সম্মুখে রামায়ণ মহাকাব্য গান করে।",
+        "moralLessonEnglish": "Peace and prosperity are built upon selfless service and adherence to truth.",
+        "moralLessonBangla": "নিঃস্বার্থ সেবা ও সত্যের প্রতি অবিচল নিষ্ঠাই হলো সমাজে শান্তি ও কল্যাণ আনার একমাত্র উপায়।",
+        "characters": ["Rama", "Sita", "Valmiki", "Lava", "Kusha"],
+        "themes": ["ramarajya", "peace", "legacy"]
+    }
+}a lake, grieving for Sita. There he met Hanuman, the minister of Sugriva, the exiled monkey king. Sugriva and Rama formed a sacred alliance: Rama promised to help Sugriva regain his kingdom from his brother Vali, and Sugriva pledged the monkey army to search for Sita across the world.",
+        "banglaText": "সীতার শোকে কাতর রামচন্দ্র পম্পা সরোবরের তীরে পৌঁছান। সেখানে সুগ্রীবের অনুচর হনুমান রাম ও লক্ষ্মণের সাথে দেখা করেন এবং তাদের সুগ্রীবের কাছে নিয়ে যান। রাম ও সুগ্রীব অগ্নিলক্ষ্য করে মৈত্রী স্থাপন করেন। রাম বালী বধের এবং সুগ্রীব সীতার অনুসন্ধানের প্রতিজ্ঞা করেন।",
+        "shortSummaryEnglish": "Rama meets Hanuman and forms a sacred alliance with Sugriva to search for Sita.",
+        "shortSummaryBangla": "পম্পা তীরে রাম ও লক্ষ্মণ হনুমানের মাধ্যমে সুগ্রীবের সাথে সাক্ষাৎ করেন এবং পারস্পরিক সাহায্য ও সীতা খোঁজার প্রতিজ্ঞা করেন।",
+        "moralLessonEnglish": "True friendship is based on mutual support, trust, and alignment in righteousness (dharma).",
+        "moralLessonBangla": "প্রকৃত বন্ধুত্ব পারস্পরিক বিশ্বাস, সত্যনিষ্ঠা এবং ধার্মিকতার ভিত্তির ওপর গড়ে ওঠে।",
+        "characters": ["Rama", "Lakshmana", "Hanuman", "Sugriva"],
+        "themes": ["friendship", "alliance", "dharma"]
+    },
+    8: {
+        "kanda": "Yuddha Kanda",
+        "kandaId": "yuddha_kanda",
+        "chapterNumber": 1,
+        "chapterTitleEnglish": "The Great War",
+        "chapterTitleBangla": "লঙ্কা যুদ্ধ",
+        "englishText": "Rama led the monkey army to the shores of the southern ocean. To cross the sea, they constructed a miraculous bridge of stones, the Rama Setu. The army marched into Lanka, leading to a colossal war between Rama's forces and Ravana's demons. Rama slew Ravana in battle, rescued Sita, and returned to Ayodhya in glory.",
+        "banglaText": "বানর সেনা নিয়ে রামচন্দ্র সমুদ্রের তীরে আসেন। সমুদ্র পার হওয়ার জন্য পাথর দিয়ে রামসেতু নির্মাণ করা হয়। এরপর লঙ্কায় পৌঁছে রামের বাহিনীর সাথে রাবণের রাক্ষস বাহিনীর যুদ্ধ শুরু হয়। রাম রাবণকে বধ করে সীতাকে উদ্ধার করেন এবং পুষ্পক রথে চড়ে অযোধ্যায় প্রত্যাবর্তন করেন।",
+        "shortSummaryEnglish": "Rama builds the sea bridge to Lanka, defeats Ravana, rescues Sita, and returns to Ayodhya.",
+        "shortSummaryBangla": "সমুদ্র পার হওয়ার জন্য রামসেতু তৈরি করা হয়। যুদ্ধে রাবণকে বধ করে সীতাকে উদ্ধার করে রাম অযোধ্যায় ফিরে আসেন।",
+        "moralLessonEnglish": "Good ultimately triumphs over evil. No matter how strong injustice appears, righteousness (dharma) prevails.",
+        "moralLessonBangla": "অধর্মের পরাজয় এবং ধর্মের জয় অবশ্যম্ভাবী। অসত্য যত শক্তিশালীই হোক না কেন, সত্যের জয় হবেই।",
+        "characters": ["Rama", "Sita", "Ravana", "Sugriva", "Hanuman", "Lakshmana"],
+        "themes": ["triumph", "war", "justice"]
+    },
+    9: {
+        "kanda": "Uttara Kanda",
+        "kandaId": "uttara_kanda",
+        "chapterNumber": 1,
+        "chapterTitleEnglish": "The Righteous Reign",
+        "chapterTitleBangla": "ধর্মরাজ্য প্রতিষ্ঠা",
+        "englishText": "Rama was crowned king of Ayodhya, establishing Ramarajya—a golden age of truth, prosperity, and peace. Lava and Kusha, the twin sons of Rama and Sita, grew up in Valmiki's hermitage and sang the sacred story of the Ramayana before Rama, completing the epic cycle.",
+        "banglaText": "অযোধ্যায় শ্রীরামচন্দ্রের রাজ্যাভিষেক হয় এবং রামরাজ্য প্রতিষ্ঠিত হয় যেখানে শান্তি ও সমৃদ্ধি বিরাজ করছিল। বাল্মীকির আশ্রমে রামের যমজ পুত্র লব ও কুশ জন্ম নেয়। তারা বাল্মীকির রচিত রামায়ণ গান গেয়ে শ্রীরামের দরবারে উপস্থিত করে।",
+        "shortSummaryEnglish": "Rama establishes a righteous reign in Ayodhya, and his sons Lava and Kusha sing the epic before him.",
+        "shortSummaryBangla": "শ্রীরামচন্দ্র অযোধ্যায় রামরাজ্য স্থাপন করেন। তাঁর দুই পুত্র লব ও কুশ তাঁরই সম্মুখে রামায়ণ মহাকাব্য গান করে।",
+        "moralLessonEnglish": "Peace and prosperity are built upon selfless service and adherence to truth.",
+        "moralLessonBangla": "নিঃস্বার্থ সেবা ও সত্যের প্রতি অবিচল নিষ্ঠাই হলো সমাজে শান্তি ও কল্যাণ আনার একমাত্র উপায়।",
+        "characters": ["Rama", "Sita", "Valmiki", "Lava", "Kusha"],
+        "themes": ["ramarajya", "peace", "legacy"]
     }
 }
 
@@ -106,10 +179,14 @@ def main():
     args = parser.parse_args()
 
     print("[Step 4] Splitting text and mapping to professional schema...")
-    os.makedirs(args.chapters_dir, exist_ok=True)
+    
+    pages_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), args.pages_dir))
+    chapters_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), args.chapters_dir))
+    
+    os.makedirs(chapters_dir, exist_ok=True)
     
     # Check page files
-    pattern = os.path.join(args.pages_dir, "page_*.json")
+    pattern = os.path.join(pages_dir, "page_*.json")
     files = sorted(glob.glob(pattern))
     
     if not files:
@@ -140,7 +217,7 @@ def main():
         chapter_id = f"{ch_data['kandaId']}_{ch_num:03d}"
         
         # 1. English Chapter Template
-        en_file = os.path.join(args.chapters_dir, f"en_{chapter_id}.json")
+        en_file = os.path.join(chapters_dir, f"en_{chapter_id}.json")
         en_json = {
             "source_id": "valmiki_ramayana_public_domain_en",
             "language": "en",
@@ -163,7 +240,7 @@ def main():
             json.dump(en_json, f, indent=2, ensure_ascii=False)
             
         # 2. Bangla Chapter Template
-        bn_file = os.path.join(args.chapters_dir, f"bn_{chapter_id}.json")
+        bn_file = os.path.join(chapters_dir, f"bn_{chapter_id}.json")
         bn_json = {
             "language": "bn",
             "kandaId": ch_data["kandaId"],

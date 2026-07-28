@@ -1,0 +1,36 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Kishkindha Kanda",
+  "kandaId": "kishkindha_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Alliance with the Monkeys",
+  "chapter_title_bangla": "বানর রাজত্বে মৈত্রী",
+  "english_text": "Rama reached the Pampa lake, grieving for Sita. There he met Hanuman, the minister of Sugriva, the exiled monkey king. Sugriva and Rama formed a sacred alliance: Rama promised to help Sugriva regain his kingdom from his brother Vali, and Sugriva pledged the monkey army to search for Sita across the world.",
+  "short_summary_english": "Rama meets Hanuman and forms a sacred alliance with Sugriva to search for Sita.",
+  "moral_lesson_english": "True friendship is based on mutual support, trust, and alignment in righteousness (dharma).",
+  "characters": [
+    "Rama",
+    "Lakshmana",
+    "Hanuman",
+    "Sugriva"
+  ],
+  "themes": [
+    "friendship",
+    "alliance",
+    "dharma"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "source_id": "valmiki_ramayana_public_domain_en",
+  "language": "en",
+  "kanda": "Uttara Kanda",
+  "kandaId": "uttara_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "The Righteous Reign",
+  "chapter_title_bangla": "ধর্মরাজ্য প্রতিষ্ঠা",
+  "english_text": "Rama was crowned king of Ayodhya, establishing Ramarajya—a golden age of truth, prosperity, and peace. Lava and Kusha, the twin sons of Rama and Sita, grew up in Valmiki's hermitage and sang the sacred story of the Ramayana before Rama, completing the epic cycle.",
+  "short_summary_english": "Rama establishes a righteous reign in Ayodhya, and his sons Lava and Kusha sing the epic before him.",
+  "moral_lesson_english": "Peace and prosperity are built upon selfless service and adherence to truth.",
+  "characters": [
+    "Rama",
+    "Sita",
+    "Valmiki",
+    "Lava",
+    "Kusha"
+  ],
+  "themes": [
+    "ramarajya",
+    "peace",
+    "legacy"
+  ],
+  "source_title": "Valmiki Ramayana (Production Refined)",
+  "source_status": "public_domain_or_user_verified",
+  "review_status": "approved_for_app",
+  "source_metadata": {
+    "source_title": "Valmiki Ramayana (Production Refined)",
+    "author_translator": "M. N. Dutt (Public Domain)",
+    "publication_year": 1891,
+    "copyright_status": "public_domain_or_user_verified",
+    "source_url": "https://archive.org/details/valmikiramayana",
+    "notes": "Verified against public domain text.",
+    "reviewer_name": "SitaRam QA Team",
+    "approval_date": "2026-06-10"
+  }
+}
