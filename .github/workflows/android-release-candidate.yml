@@ -56,7 +56,7 @@ jobs:
       - name: Run Flutter tests
         run: flutter test
 
-      - name: Validate required release secrets
+      - name: Validate required build secrets
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -76,6 +76,17 @@ jobs:
             https://*) ;;
             *) echo "SITARAM_HF_ENDPOINT must use HTTPS for a release build." >&2; exit 1 ;;
           esac
+
+      - name: Validate Google Play upload secret
+        if: ${{ inputs.upload_to_internal_testing }}
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "Missing required GitHub Actions secret: PLAY_SERVICE_ACCOUNT_JSON" >&2
+            exit 1
+          fi
 
       - name: Restore Android upload keystore
         env:
@@ -117,6 +128,15 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab.sha256
           if-no-files-found: error
           retention-days: 14
+
+      - name: Prepare Google Play release notes
+        if: ${{ inputs.upload_to_internal_testing }}
+        env:
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+        run: |
+          set -euo pipefail
+          mkdir -p distribution/whatsnew
+          printf '%s\n' "$RELEASE_NOTES" > distribution/whatsnew/whatsnew-en-US
 
       - name: Upload to Google Play internal testing
         if: ${{ inputs.upload_to_internal_testing }}
