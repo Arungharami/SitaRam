@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "note": "Registry of physical source artefacts used for ingestion. Every field here is transcribed from the archive.org item metadata and the scanned title page. Nothing in this file is inferred, generated, or assumed. A source may not be imported until validate_source.py confirms the local file matches sha256.",
+  "sources": {
+    "m_n_dutt_1891_bala_kanda": {
+      "editionId": "m_n_dutt_1891_bala_kanda",
+      "work": "Valmiki Ramayana",
+      "sourceTitle": "The Ramayana",
+      "originalAuthor": "Valmiki",
+      "translator": "Manmatha Nath Dutt",
+      "editor": "Manmatha Nath Dutt",
+      "publisher": "Printed by Girish Chandra Chackravarti, Deva Press",
+      "publicationCity": "Calcutta",
+      "publicationYear": 1891,
+      "volume": "Bala Kandam",
+      "edition": "First edition",
+      "language": "en",
+      "kandaId": "bala_kanda",
+      "archiveIdentifier": "ramayanablaknda00vlgoog",
+      "sourceUrl": "https://archive.org/details/ramayanablaknda00vlgoog",
+      "downloadUrl": "https://archive.org/download/ramayanablaknda00vlgoog/ramayanablaknda00vlgoog_djvu.txt",
+      "pageMapUrl": "https://archive.org/download/ramayanablaknda00vlgoog/ramayanablaknda00vlgoog_djvu.xml",
+      "sourceFilename": "ramayanablaknda00vlgoog_djvu.xml",
+      "fileSizeBytes": 3427624,
+      "sha256": "08dbf4d095bac9e199872eacbf7a7721c721bfe4abddcd331af5284dfa907c70",
+      "plainTextFilename": "ramayanablaknda00vlgoog_djvu.txt",
+      "plainTextSizeBytes": 368882,
+      "plainTextSha256": "20afd5065e95ff632cf96ccc651ef5d625273a1c49f8a3a0f2458838c5b4b1a8",
+      "scanPageCount": 198,
+      "scanningContributor": "Harvard University",
+      "scanningSponsor": "Google",
+      "publicDomainBasis": "Published 1891 in Calcutta, more than 95 years before the current year and prior to 1929; no copyright renewal is possible for a work of this date. archive.org records the item's copyright status as NOT_IN_COPYRIGHT. The translator, Manmatha Nath Dutt (1855-1912), died more than 70 years ago, so the work is also public domain in life+70 jurisdictions.",
+      "copyrightStatus": "public_domain",
+      "archiveCopyrightField": "NOT_IN_COPYRIGHT",
+      "dateAccessed": "2026-08-03",
+      "notes": "Harvard University copy digitised by Google. OCR quality on transliterated Sanskrit diacritics is poor (for example 'RSma' for 'Rama', 'SitS' for 'Sita'). Raw OCR is preserved verbatim; no automated correction of transliteration is permitted. A human reviewer must decide every correction and record it in the passage's corrections[] audit trail.",
+      "printedPageOffset": 15,
+      "printedPageOffsetNote": "Scan index 16 (0-based) is printed page 1, the first page of Bala Kandam Section I. printedPage = scanIndex - 15."
+    }
+  }
+}

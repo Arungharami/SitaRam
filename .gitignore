@@ -49,3 +49,9 @@ app.*.map.json
 *.jks
 *.keystore
 *.p12
+
+# Downloaded source scans (large, retrievable via source_registry.json checksum + URL).
+# The raw *extractions* under data/raw_extractions/ ARE tracked; the multi-MB
+# originals are not. See tools/content_import/README.md to re-download.
+tools/content_import/sources/*
+!tools/content_import/sources/.gitkeep
