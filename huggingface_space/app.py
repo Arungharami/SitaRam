@@ -1,5 +1,6 @@
 import os
 import re
+import hmac
 import json
 import logging
 from typing import List, Dict, Any, Optional
@@ -12,8 +13,56 @@ logger = logging.getLogger("sitaram-ai-backend")
 
 app = FastAPI(title="SitaRam Ramayana AI API", version="1.0.0")
 
-# Load environment configuration
-SITARAM_APP_KEY = os.getenv("SITARAM_APP_KEY", "sitaram_secret_key_108")
+# --- Application key: fail closed -------------------------------------------
+# There is deliberately no production default. A committed fallback key is not a
+# secret: anyone with the repo (or the shipped APK) would hold it. If the
+# deployment forgets to set SITARAM_APP_KEY, the service must refuse to start
+# rather than come up silently accepting a publicly known value.
+#
+# SITARAM_ALLOW_INSECURE_TEST_KEY=1 opts a local/CI process into a throwaway
+# test key. It must never be set in a deployed environment.
+SITARAM_TEST_KEY = "insecure-local-test-key"
+
+
+class InsecureConfigurationError(RuntimeError):
+    """Raised when the service is asked to run without an application key."""
+
+
+def resolve_app_key(env=None):
+    """
+    Returns the application key, or raises InsecureConfigurationError.
+
+    Never logs the key. Callers must not print the return value.
+    """
+    env = os.environ if env is None else env
+    key = (env.get("SITARAM_APP_KEY") or "").strip()
+    if key:
+        if key == SITARAM_TEST_KEY and env.get("SITARAM_ALLOW_INSECURE_TEST_KEY") != "1":
+            raise InsecureConfigurationError(
+                "SITARAM_APP_KEY is set to the known test key. Refusing to start. "
+                "Set a real secret, or set SITARAM_ALLOW_INSECURE_TEST_KEY=1 for local testing only."
+            )
+        if len(key) < 16:
+            raise InsecureConfigurationError(
+                "SITARAM_APP_KEY is shorter than 16 characters. Refusing to start with a weak key."
+            )
+        return key
+
+    if env.get("SITARAM_ALLOW_INSECURE_TEST_KEY") == "1":
+        logger.warning(
+            "SITARAM_APP_KEY is unset and SITARAM_ALLOW_INSECURE_TEST_KEY=1; using the "
+            "throwaway local test key. This must never happen in a deployed environment."
+        )
+        return SITARAM_TEST_KEY
+
+    raise InsecureConfigurationError(
+        "SITARAM_APP_KEY is not set. The backend refuses to start without an application "
+        "key so it cannot fall back to a publicly known default. Set SITARAM_APP_KEY in the "
+        "deployment secrets (Hugging Face Space -> Settings -> Variables and secrets)."
+    )
+
+
+SITARAM_APP_KEY = resolve_app_key()
 MODEL_ID = os.getenv("MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct")
 MAX_CONTEXT_PASSAGES = int(os.getenv("MAX_CONTEXT_PASSAGES", "6"))
 
@@ -111,7 +160,9 @@ def verify_citations(answer: str, context_passages: List[Dict[str, Any]]) -> Lis
 
 # Security check middleware
 def verify_app_key(x_sitaram_key: Optional[str] = Header(None)):
-    if x_sitaram_key != SITARAM_APP_KEY:
+    # Constant-time compare so a caller cannot recover the key byte by byte
+    # from response timing. The key itself is never echoed or logged.
+    if not x_sitaram_key or not hmac.compare_digest(str(x_sitaram_key), SITARAM_APP_KEY):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing X-SitaRam-Key header token."

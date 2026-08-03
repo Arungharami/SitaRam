@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+import os
+
+# The backend now fails closed when SITARAM_APP_KEY is absent, so the test
+# process opts explicitly into the throwaway local key before importing it.
+os.environ.setdefault("SITARAM_ALLOW_INSECURE_TEST_KEY", "1")
+
 import json
 import unittest
 from fastapi.testclient import TestClient
@@ -10,7 +16,7 @@ client = TestClient(app)
 class TestSitaRamBackend(unittest.TestCase):
     def setUp(self):
         self.headers = {
-            "X-SitaRam-Key": "sitaram_secret_key_108"
+            "X-SitaRam-Key": backend.SITARAM_APP_KEY
         }
 
     def test_health_endpoint(self):
@@ -77,7 +83,7 @@ class TestRetrievalTrustGate(unittest.TestCase):
             self.skipTest("Corpus contains verified passages; refusal path not applicable.")
         response = client.post(
             "/ask",
-            headers={"X-SitaRam-Key": "sitaram_secret_key_108"},
+            headers={"X-SitaRam-Key": backend.SITARAM_APP_KEY},
             json={"question": "Why did Rama accept exile?", "languageCode": "en"},
         )
         data = response.json()
@@ -87,3 +93,61 @@ class TestRetrievalTrustGate(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAppKeyFailsClosed(unittest.TestCase):
+    """
+    The backend must refuse to start rather than fall back to a committed
+    default key. These tests exercise resolve_app_key directly with explicit
+    environments so they never depend on the ambient process environment.
+    """
+
+    def test_missing_key_raises(self):
+        with self.assertRaises(backend.InsecureConfigurationError) as ctx:
+            backend.resolve_app_key(env={})
+        self.assertIn("SITARAM_APP_KEY is not set", str(ctx.exception))
+
+    def test_blank_key_raises(self):
+        for blank in ["", "   ", "\t"]:
+            with self.assertRaises(backend.InsecureConfigurationError):
+                backend.resolve_app_key(env={"SITARAM_APP_KEY": blank})
+
+    def test_short_key_raises(self):
+        with self.assertRaises(backend.InsecureConfigurationError) as ctx:
+            backend.resolve_app_key(env={"SITARAM_APP_KEY": "tooshort"})
+        self.assertIn("shorter than 16", str(ctx.exception))
+
+    def test_no_committed_production_default_exists(self):
+        """The old hardcoded fallback must be gone from the source entirely."""
+        here = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(here, "app.py"), encoding="utf-8") as f:
+            source = f.read()
+        self.assertNotIn("sitaram_secret_key_108", source)
+        self.assertNotIn('os.getenv("SITARAM_APP_KEY", ', source)
+
+    def test_test_key_requires_explicit_opt_in(self):
+        with self.assertRaises(backend.InsecureConfigurationError):
+            backend.resolve_app_key(env={"SITARAM_APP_KEY": backend.SITARAM_TEST_KEY})
+
+    def test_test_key_allowed_only_with_flag(self):
+        key = backend.resolve_app_key(env={"SITARAM_ALLOW_INSECURE_TEST_KEY": "1"})
+        self.assertEqual(key, backend.SITARAM_TEST_KEY)
+
+    def test_real_key_is_accepted(self):
+        key = backend.resolve_app_key(env={"SITARAM_APP_KEY": "a-sufficiently-long-real-key"})
+        self.assertEqual(key, "a-sufficiently-long-real-key")
+
+    def test_key_is_never_exposed_by_endpoints(self):
+        """No endpoint may echo the application key."""
+        for path in ["/health", "/coverage"]:
+            body = client.get(path).text
+            self.assertNotIn(backend.SITARAM_APP_KEY, body)
+
+    def test_wrong_key_is_rejected(self):
+        r = client.post("/search", json={"query": "rama"},
+                        headers={"X-SitaRam-Key": "definitely-the-wrong-key"})
+        self.assertEqual(r.status_code, 401)
+
+    def test_missing_header_is_rejected(self):
+        r = client.post("/search", json={"query": "rama"})
+        self.assertEqual(r.status_code, 401)
