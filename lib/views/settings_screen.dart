@@ -128,7 +128,7 @@ class SettingsScreen extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.saffronPrimary)),
-              error: (_, __) => const Text('Failed to load coverage report.', style: TextStyle(color: Colors.redAccent)),
+              error: (_, _) => const Text('Failed to load coverage report.', style: TextStyle(color: Colors.redAccent)),
             ),
           ),
           const SizedBox(height: 24),
