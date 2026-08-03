@@ -11,10 +11,12 @@ class AiService {
     defaultValue: 'http://localhost:5500', // fallback to local mock server
   );
   
-  static const String hfAppKey = String.fromEnvironment(
-    'SITARAM_HF_APP_KEY',
-    defaultValue: 'sitaram_secret_key_108',
-  );
+  // No default. Anything compiled into the APK can be extracted, so a baked-in
+  // key is not a secret. When it is absent the app stays in offline mode rather
+  // than shipping a publicly known value that the backend now rejects anyway.
+  // Supply it at build time:
+  //   flutter build appbundle --dart-define=SITARAM_HF_APP_KEY="$SITARAM_HF_APP_KEY"
+  static const String hfAppKey = String.fromEnvironment('SITARAM_HF_APP_KEY');
 
   static const String _geminiApiKeyPrefKey = 'gemini_api_key';
 
@@ -33,9 +35,13 @@ class AiService {
     await prefs.remove(_geminiApiKeyPrefKey);
   }
 
-  // Check if live AI is configured
+  // Live AI needs both a real endpoint and a key supplied at build time.
+  // Without the key the request would be rejected with 401, so treat it as
+  // unconfigured and use the offline path instead.
   bool get isLiveConfigured {
-    return hfEndpoint.isNotEmpty && hfEndpoint != 'http://localhost:5500';
+    return hfEndpoint.isNotEmpty &&
+        hfEndpoint != 'http://localhost:5500' &&
+        hfAppKey.isNotEmpty;
   }
 
   // RAG query to Hugging Face FastAPI Space
