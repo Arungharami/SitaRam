@@ -14,6 +14,23 @@ SitaRam integrates a client Flutter mobile app with a Python FastAPI RAG backend
 
 ---
 
+## 📜 Content Trust
+
+SitaRam does not treat text as scripture until a person has checked it against
+the printed source. Imported text is excluded from the AI retrieval corpus, the
+search and embedding indexes, and from being shown as verified in the app until
+a named reviewer approves it, and every approval is recorded in an audit trail.
+
+Current state: **1 real-source Sarga imported** (Dutt 1891, Bala Kanda Sarga 1,
+printed pages 1-8), **0 verified**, **0 approved for retrieval**, **0 approved
+for the app**. Coverage is generated, never asserted — see
+`assets/content/coverage_report.json`.
+
+See [docs/INGESTION_AND_REVIEW.md](docs/INGESTION_AND_REVIEW.md) and
+[docs/SOURCE_REGISTRY.md](docs/SOURCE_REGISTRY.md).
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites

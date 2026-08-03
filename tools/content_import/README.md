@@ -98,3 +98,41 @@ Audiobooks are defined in the chapter metadata. The app expects MP3 audio files 
 To update audiobook metadata (e.g., setting actual `duration` and changing `"status"` from `"placeholder"` to `"ready"`):
 1. Open the compiled `export_json.py` or directly update the exporter script.
 2. The app's reader page will automatically show the media player controls and load the audio tracks when they are marked `"ready"`.
+
+---
+
+# Real-source ingestion (v2)
+
+The pipeline above produces the legacy v1 records under `data/records/`, which
+now hold only bootstrap placeholders. **Real public-domain scripture uses the v2
+pipeline instead.** Full guide: [docs/INGESTION_AND_REVIEW.md](../../docs/INGESTION_AND_REVIEW.md).
+
+```bash
+# 1. fetch the registered source (not committed; pinned by SHA-256)
+curl -L -o tools/content_import/sources/ramayanablaknda00vlgoog_djvu.xml \
+  https://archive.org/download/ramayanablaknda00vlgoog/ramayanablaknda00vlgoog_djvu.xml
+
+# 2. verify it matches the registry
+python tools/validation/check_source_registry.py
+
+# 3. import (stages 1-8: checksum, extract, preserve raw, normalize, segment, build)
+python tools/content_import/import_source.py \
+  --edition-id m_n_dutt_1891_bala_kanda \
+  --source tools/content_import/sources/ramayanablaknda00vlgoog_djvu.xml \
+  --kanda bala_kanda --sarga-start 1 --sarga-end 1 \
+  --import-date 2026-08-03
+
+# 4. validate
+python tools/validation/check_passages.py
+python tools/validation/run_all.py
+
+# 5. produce reviewer evidence
+python tools/content_import/review_report.py \
+  --passage m_n_dutt_1891_bala_kanda_sarga_001_p001 \
+  --out docs/review/m_n_dutt_1891_bala_kanda_sarga_001_p001.md
+```
+
+Imported passages land at trust state `imported`: not verified, not approved for
+retrieval, not approved for the app, excluded from every index. Only
+`review_record.py`, run by a named human, can change that. `import_source.py`
+cannot approve anything, and neither can Claude.

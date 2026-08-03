@@ -19,3 +19,25 @@ SitaRam enforces strict guidelines to preserve the accuracy and sanctity of the 
 5. **Unverified content is never presented as verified**: unapproved chapters may appear in the app only when explicitly flagged `verified: false`, and are excluded from the AI retrieval corpus entirely.
 6. **No false provenance**: text is only attributed to a source edition once it has been verified against that edition. Unverified editorial retellings are labelled as such, not credited to a translator.
 7. **Completeness is never claimed**: the corpus is incomplete until all 645 Sargas across 7 Kandas are approved. Reports state `corpusComplete: false` until then.
+
+## Real-source ingestion (v2 passages)
+
+Text imported from a registered public-domain edition follows a stricter,
+audited path. See [INGESTION_AND_REVIEW.md](INGESTION_AND_REVIEW.md).
+
+8. **Sources are registered and checksummed before use**: an edition must carry
+   full publication provenance and a documented public-domain basis, and the
+   local file's SHA-256 must match the registry before any import runs.
+9. **Raw extraction is immutable**: the verbatim per-page extraction is written
+   once and never rewritten. Re-importing over changed raw text aborts.
+10. **Normalization is mechanical only**: running headers, hyphenated
+    line-breaks, and repeated whitespace. Never words, spelling, transliteration,
+    or punctuation within a sentence. Every operation applied is recorded.
+11. **OCR is never silently corrected**: a correction requires a human decision
+    recorded in `corrections[]` with the original form, corrected form, and reason.
+12. **Trust states cannot be skipped**: imported -> needs_review -> text_verified
+    -> approved_for_retrieval -> approved_for_app. Every transition is a human
+    decision appended to an immutable `approvalHistory`.
+13. **Reviewers must be accountable people**: placeholder, team, and automation
+    identities are refused by the tooling. Claude may prepare review evidence but
+    must never issue verify or approve decisions on real scripture.

@@ -11,6 +11,10 @@ python tools/validation/run_all.py
 
 ## Run Individual Ingestion Checks
 ```bash
+# everything at once
+python tools/validation/run_all.py
+
+# individually
 python tools/validation/validate_schema.py
 python tools/validation/check_duplicates.py
 python tools/validation/check_numbering.py
@@ -70,3 +74,36 @@ A record is only usable as verified scripture when it satisfies *all* of:
 These rules live in one place, `tools/validation/corpus_rules.py`, and are imported by
 the validators, the indexers, the exporters, and the coverage report generator. A record
 cannot promote itself simply by having its status field edited.
+
+## Real-source ingestion tests
+
+```bash
+python tools/validation/test_ingestion.py        # 40 tests
+python tools/validation/check_passages.py
+python tools/validation/check_source_registry.py
+```
+
+`test_ingestion.py` proves both directions of the gate:
+
+- **blocked**: placeholder text, missing provenance, missing or fake reviewer,
+  invalid and reversed page ranges, missing checksum, unregistered edition,
+  imported-only, verified-but-not-retrieval-approved, and trust flags forged
+  without an audit trail;
+- **allowed**: a correctly human-approved synthetic fixture becomes retrieval
+  eligible, retrieval approval alone is not app approval, and revocation removes
+  eligibility while preserving history.
+
+Approval tests use synthetic fixtures only. One test asserts the real imported
+Dutt passage is still `imported` with an empty `approvalHistory` and that both
+generated indexes are empty, so no automated run can quietly approve scripture.
+
+## Backend security tests
+
+```bash
+cd huggingface_space
+SITARAM_ALLOW_INSECURE_TEST_KEY=1 python -m unittest test_backend
+```
+
+Includes fail-closed tests: the service refuses to start without
+`SITARAM_APP_KEY`, refuses blank and short keys, refuses the test key unless
+`SITARAM_ALLOW_INSECURE_TEST_KEY=1`, and no endpoint echoes the key.
