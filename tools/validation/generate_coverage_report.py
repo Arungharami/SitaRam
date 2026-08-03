@@ -14,6 +14,8 @@ import glob
 from datetime import datetime, timezone
 
 import corpus_rules
+import corpus_loader
+import passage_rules
 
 CANONICAL_SARGA_COUNTS = corpus_rules.CANONICAL_SARGA_COUNTS
 
@@ -85,6 +87,65 @@ def generate_coverage_report(records_dir, output_file):
             if not corpus_rules.is_placeholder_text(translations.get(lang, "")):
                 lang_sarga_filled[lang] += 1
 
+    # --- v2 real-source passages (data/passages/) ---------------------------
+    # These are counted separately from the legacy placeholder records so the
+    # report can never blur "we imported real source text" with "we have
+    # verified scripture".
+    passages_dir = os.path.join(os.path.dirname(records_dir), "passages")
+    registry = corpus_loader.load_registry()
+    _, passages = corpus_loader.load_all(records_dir, passages_dir)
+
+    real_imported = 0
+    real_verified = 0
+    real_retrieval = 0
+    real_app = 0
+    real_rejected = 0
+    passage_state_counts = {}
+    reviewers = set()
+    real_kanda_sargas = {}
+
+    for p in passages:
+        real_imported += 1
+        state = passage_rules.trust_state(p)
+        passage_state_counts[state] = passage_state_counts.get(state, 0) + 1
+
+        trust = p.get("trust") or {}
+        if trust.get("reviewer"):
+            reviewers.add(trust["reviewer"])
+        if p.get("editionId"):
+            editions.add(p["editionId"])
+        prov = p.get("provenance") or {}
+        if prov.get("translator"):
+            translators.add(prov["translator"])
+        if state == "rejected":
+            real_rejected += 1
+
+        kid = p.get("kandaId")
+        if kid:
+            real_kanda_sargas.setdefault(kid, set()).add(p.get("sargaNumber"))
+
+        reasons = []
+        if passage_rules.is_retrieval_eligible(p, reasons, registry=registry):
+            real_retrieval += 1
+            real_verified += 1
+        else:
+            if state in passage_rules.RETRIEVAL_ELIGIBLE_STATES:
+                blocking_issues.extend(reasons)
+            elif state == "text_verified":
+                real_verified += 1
+        if passage_rules.is_app_eligible(p, registry=registry):
+            real_app += 1
+
+    verified_count += real_verified
+    retrieval_count += real_retrieval
+    app_count += real_app
+
+    if real_imported and real_retrieval == 0:
+        blocking_issues.append(
+            f"{real_imported} real-source passage(s) are imported but none has completed human "
+            f"review; they are excluded from retrieval and from the app."
+        )
+
     languages = {
         lang: {
             "coveragePercent": round((filled / total_expected) * 100, 2) if total_expected > 0 else 0.0,
@@ -115,12 +176,24 @@ def generate_coverage_report(records_dir, output_file):
         "kandasExpected": 7,
         "kandasComplete": kandas_complete,
         "sargasExpected": total_expected,
-        "sargasImported": imported_count,
+        "sargasImported": imported_count + real_imported,
         "sargasPlaceholder": placeholder_count,
+        "sargasRealSourceImported": real_imported,
         "sargasTextVerified": verified_count,
         "sargasApprovedForRetrieval": retrieval_count,
         "sargasApprovedForApp": app_count,
+        "sargasRejected": real_rejected,
+        "realSource": {
+            "imported": real_imported,
+            "textVerified": real_verified,
+            "approvedForRetrieval": real_retrieval,
+            "approvedForApp": real_app,
+            "rejected": real_rejected,
+            "trustStateCounts": passage_state_counts,
+            "kandaSargas": {k: sorted(v) for k, v in sorted(real_kanda_sargas.items())},
+        },
         "declaredReviewStatusCounts": declared_status_counts,
+        "reviewers": sorted(reviewers),
         "provenance": {
             "editions": sorted(editions),
             "translators": sorted(translators),

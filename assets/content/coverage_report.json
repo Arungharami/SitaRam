@@ -1,21 +1,40 @@
 {
-  "editionId": "m_n_dutt_public_domain",
-  "generatedAt": "2026-08-03T05:37:54.161579Z",
+  "editionId": "m_n_dutt_1891_bala_kanda",
+  "generatedAt": "2026-08-03T17:28:03.207397Z",
   "generatedBy": "tools/validation/generate_coverage_report.py",
   "corpusComplete": false,
   "kandasExpected": 7,
   "kandasComplete": 0,
   "sargasExpected": 645,
-  "sargasImported": 7,
+  "sargasImported": 8,
   "sargasPlaceholder": 7,
+  "sargasRealSourceImported": 1,
   "sargasTextVerified": 0,
   "sargasApprovedForRetrieval": 0,
   "sargasApprovedForApp": 0,
+  "sargasRejected": 0,
+  "realSource": {
+    "imported": 1,
+    "textVerified": 0,
+    "approvedForRetrieval": 0,
+    "approvedForApp": 0,
+    "rejected": 0,
+    "trustStateCounts": {
+      "imported": 1
+    },
+    "kandaSargas": {
+      "bala_kanda": [
+        1
+      ]
+    }
+  },
   "declaredReviewStatusCounts": {
     "raw_import": 7
   },
+  "reviewers": [],
   "provenance": {
     "editions": [
+      "m_n_dutt_1891_bala_kanda",
       "m_n_dutt_public_domain"
     ],
     "translators": [
@@ -82,6 +101,7 @@
     }
   },
   "blockingIssues": [
+    "1 real-source passage(s) are imported but none has completed human review; they are excluded from retrieval and from the app.",
     "7 of 7 imported record(s) contain placeholder or stub-length text and require real segmented source text before human review.",
     "No record has passed human verification yet; the corpus is not usable as verified scripture."
   ]

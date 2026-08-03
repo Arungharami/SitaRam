@@ -12,6 +12,9 @@ CHECKS = [
     "check_placeholder_text.py",
     "check_language_support.py",
     "check_review_gate.py",
+    # v2 real-source passage records
+    "check_passages.py",
+    "check_source_registry.py",
 ]
 
 def main():
