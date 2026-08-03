@@ -6,6 +6,7 @@ import '../models/ai_response.dart';
 import '../models/citation.dart';
 import '../providers/locale_provider.dart';
 import '../services/ai_service.dart';
+import '../services/content_service.dart';
 import '../theme.dart';
 import 'reader_screen.dart';
 
@@ -458,7 +459,7 @@ class _AiChatScreenState extends ConsumerState<AiChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.between,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
