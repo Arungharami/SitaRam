@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import argparse
 import glob
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "validation"))
+import corpus_rules
 
 def get_kanda_display_name(kanda_id):
     mapping = {
@@ -39,20 +43,28 @@ def generate_records(edition_id):
         if len(parts) != 2:
             continue
         kanda_id = parts[0]
+        if kanda_id not in corpus_rules.CANONICAL_KANDA_IDS:
+            print(f"Skipping '{filename}': '{kanda_id}' is not one of the 7 canonical Kandas.")
+            continue
         try:
             sarga_num = int(parts[1])
         except ValueError:
-            sarga_num = 1
-            
+            print(f"Skipping '{filename}': Sarga number '{parts[1]}' is not an integer.")
+            continue
+        max_sarga = corpus_rules.CANONICAL_SARGA_COUNTS[kanda_id]
+        if not 1 <= sarga_num <= max_sarga:
+            print(f"Skipping '{filename}': Sarga {sarga_num} is outside the canonical range 1-{max_sarga}.")
+            continue
+
         with open(file_path, 'r', encoding='utf-8') as f:
             source_text = f.read()
 
         record = {
-            "documentId": f"{edition_id}_{filename}",
+            "documentId": f"{edition_id}_{kanda_id}_sarga_{sarga_num:03d}",
             "work": "Valmiki Ramayana",
             "editionId": edition_id,
             "kandaId": kanda_id,
-            "kandaOrder": 1, # would dynamically map this in production
+            "kandaOrder": corpus_rules.KANDA_ORDER[kanda_id],
             "kandaName": get_kanda_display_name(kanda_id),
             "sargaNumber": sarga_num,
             "sargaTitleEnglish": f"Sarga {sarga_num}",

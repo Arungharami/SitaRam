@@ -1,0 +1,37 @@
+{
+  "source_id": "sitaram_editorial_retelling_en",
+  "language": "en",
+  "kanda": "Uttara Kanda",
+  "kandaId": "uttara_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "The Righteous Reign",
+  "chapter_title_bangla": "ধর্মরাজ্য প্রতিষ্ঠা",
+  "english_text": "Rama was crowned king of Ayodhya, establishing Ramarajya—a golden age of truth, prosperity, and peace. Lava and Kusha, the twin sons of Rama and Sita, grew up in Valmiki's hermitage and sang the sacred story of the Ramayana before Rama, completing the epic cycle.",
+  "short_summary_english": "Rama establishes a righteous reign in Ayodhya, and his sons Lava and Kusha sing the epic before him.",
+  "moral_lesson_english": "Peace and prosperity are built upon selfless service and adherence to truth.",
+  "characters": [
+    "Rama",
+    "Sita",
+    "Valmiki",
+    "Lava",
+    "Kusha"
+  ],
+  "themes": [
+    "ramarajya",
+    "peace",
+    "legacy"
+  ],
+  "source_title": "SitaRam editorial retelling (provenance unverified)",
+  "source_status": "unverified",
+  "review_status": "needs_review",
+  "source_metadata": {
+    "source_title": "SitaRam editorial retelling (provenance unverified)",
+    "author_translator": "",
+    "publication_year": null,
+    "copyright_status": "unverified",
+    "source_url": "",
+    "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+    "reviewer_name": null,
+    "approval_date": null
+  }
+}

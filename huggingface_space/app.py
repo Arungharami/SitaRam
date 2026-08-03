@@ -19,13 +19,32 @@ MAX_CONTEXT_PASSAGES = int(os.getenv("MAX_CONTEXT_PASSAGES", "6"))
 
 # Load mock dataset locally for space verification and local fallbacks
 assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "content"))
+all_chapters = []
 sargas_db = []
+
+
+def is_verified_passage(chapter):
+    """
+    Retrieval trust gate. A passage is only usable as grounding evidence when the
+    exporter marked it verified AND its review status says approved_for_app.
+    Chapters missing the flag are treated as unverified: absence of a claim is
+    never treated as approval.
+    """
+    return chapter.get("verified") is True and chapter.get("reviewStatus") == "approved_for_app"
+
+
 try:
     chapters_path = os.path.join(assets_dir, "ramayana_chapters.json")
     if os.path.exists(chapters_path):
         with open(chapters_path, 'r', encoding='utf-8') as f:
-            sargas_db = json.load(f)
-        logger.info(f"Loaded {len(sargas_db)} Sargas from assets folder.")
+            all_chapters = json.load(f)
+        # Unverified content is never placed in the retrieval corpus, so the AI
+        # cannot quote or cite it as scripture.
+        sargas_db = [c for c in all_chapters if is_verified_passage(c)]
+        logger.info(
+            f"Loaded {len(all_chapters)} chapters; {len(sargas_db)} are verified and "
+            f"retrieval-eligible ({len(all_chapters) - len(sargas_db)} withheld as unverified)."
+        )
 except Exception as e:
     logger.error(f"Error loading Sargas database: {e}")
 
@@ -105,7 +124,10 @@ def health_check():
         "model": MODEL_ID,
         "dataset": "arun-gharami/SitaRam-valmiki-ramayana-dataset",
         "corpusVersion": "1.0.0",
-        "coverageStatus": "7 Kandas segmented",
+        "chaptersLoaded": len(all_chapters),
+        "verifiedPassages": len(sargas_db),
+        "unverifiedWithheld": len(all_chapters) - len(sargas_db),
+        "corpusComplete": False,
         "retrievalReady": len(sargas_db) > 0
     }
 

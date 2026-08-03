@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/chapter.dart';
 import '../models/ai_response.dart';
-import '../models/citation.dart';
 
 class AiService {
   // Read compilation-defined endpoint details
@@ -182,20 +180,17 @@ class AiService {
       answer: answer,
       languageCode: languageCode,
       mode: mode,
-      confidence: 'medium',
-      citations: [
-        Citation(
-          documentId: 'm_n_dutt_public_domain_bala_kanda_sarga_001',
-          kanda: 'Bala Kanda',
-          sarga: 1,
-          edition: 'M. N. Dutt (Public Domain)',
-          translator: 'Manmatha Nath Dutt',
-          contentType: 'source_text',
-          quotedText: 'Who in the world today is heroic and righteous? Rama, born in the Ikshvaku line...',
-        )
-      ],
+      confidence: 'low',
+      // No retrieval happens offline, so there is no passage to cite. Emitting a
+      // citation here would attribute an unverified quotation to a source edition
+      // that was never consulted.
+      citations: const [],
       interpretationLabel: label,
-      limitations: ['Generated locally without network connection.'],
+      limitations: const [
+        'Generated locally without a network connection.',
+        'Not grounded in any retrieved source passage — this is a general summary, not scripture.',
+        'No edition, translator, or Sarga can be cited for this response.',
+      ],
     );
   }
 }

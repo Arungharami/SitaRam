@@ -1,5 +1,5 @@
 {
-  "source_id": "valmiki_ramayana_public_domain_en",
+  "source_id": "sitaram_editorial_retelling_en",
   "language": "en",
   "kanda": "Bala Kanda",
   "kandaId": "bala_kanda",
@@ -18,17 +18,17 @@
     "poetry",
     "dharma"
   ],
-  "source_title": "Valmiki Ramayana (Production Refined)",
-  "source_status": "public_domain_or_user_verified",
-  "review_status": "approved_for_app",
+  "source_title": "SitaRam editorial retelling (provenance unverified)",
+  "source_status": "unverified",
+  "review_status": "needs_review",
   "source_metadata": {
-    "source_title": "Valmiki Ramayana (Production Refined)",
-    "author_translator": "M. N. Dutt (Public Domain)",
-    "publication_year": 1891,
-    "copyright_status": "public_domain_or_user_verified",
-    "source_url": "https://archive.org/details/valmikiramayana",
-    "notes": "Verified against public domain text.",
-    "reviewer_name": "SitaRam QA Team",
-    "approval_date": "2026-06-10"
+    "source_title": "SitaRam editorial retelling (provenance unverified)",
+    "author_translator": "",
+    "publication_year": null,
+    "copyright_status": "unverified",
+    "source_url": "",
+    "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+    "reviewer_name": null,
+    "approval_date": null
   }
 }

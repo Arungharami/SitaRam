@@ -1,13 +1,27 @@
 {
   "editionId": "m_n_dutt_public_domain",
-  "generatedAt": "2026-07-17T20:01:18.280398Z",
+  "generatedAt": "2026-08-03T05:37:54.161579Z",
+  "generatedBy": "tools/validation/generate_coverage_report.py",
+  "corpusComplete": false,
   "kandasExpected": 7,
   "kandasComplete": 0,
   "sargasExpected": 645,
   "sargasImported": 7,
+  "sargasPlaceholder": 7,
   "sargasTextVerified": 0,
   "sargasApprovedForRetrieval": 0,
   "sargasApprovedForApp": 0,
+  "declaredReviewStatusCounts": {
+    "raw_import": 7
+  },
+  "provenance": {
+    "editions": [
+      "m_n_dutt_public_domain"
+    ],
+    "translators": [
+      "Manmatha Nath Dutt"
+    ]
+  },
   "kandaSargaCoverage": {
     "bala_kanda": {
       "imported": 1,
@@ -47,8 +61,8 @@
   },
   "languages": {
     "en": {
-      "coveragePercent": 1.09,
-      "sargasFilled": 7
+      "coveragePercent": 0.0,
+      "sargasFilled": 0
     },
     "bn": {
       "coveragePercent": 0.0,
@@ -67,5 +81,8 @@
       "sargasFilled": 0
     }
   },
-  "blockingIssues": []
+  "blockingIssues": [
+    "7 of 7 imported record(s) contain placeholder or stub-length text and require real segmented source text before human review.",
+    "No record has passed human verification yet; the corpus is not usable as verified scripture."
+  ]
 }

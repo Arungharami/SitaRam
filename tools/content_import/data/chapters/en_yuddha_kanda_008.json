@@ -1,0 +1,38 @@
+{
+  "source_id": "sitaram_editorial_retelling_en",
+  "language": "en",
+  "kanda": "Yuddha Kanda",
+  "kandaId": "yuddha_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "The Great War",
+  "chapter_title_bangla": "লঙ্কা যুদ্ধ",
+  "english_text": "Rama led the monkey army to the shores of the southern ocean. To cross the sea, they constructed a miraculous bridge of stones, the Rama Setu. The army marched into Lanka, leading to a colossal war between Rama's forces and Ravana's demons. Rama slew Ravana in battle, rescued Sita, and returned to Ayodhya in glory.",
+  "short_summary_english": "Rama builds the sea bridge to Lanka, defeats Ravana, rescues Sita, and returns to Ayodhya.",
+  "moral_lesson_english": "Good ultimately triumphs over evil. No matter how strong injustice appears, righteousness (dharma) prevails.",
+  "characters": [
+    "Rama",
+    "Sita",
+    "Ravana",
+    "Sugriva",
+    "Hanuman",
+    "Lakshmana"
+  ],
+  "themes": [
+    "triumph",
+    "war",
+    "justice"
+  ],
+  "source_title": "SitaRam editorial retelling (provenance unverified)",
+  "source_status": "unverified",
+  "review_status": "needs_review",
+  "source_metadata": {
+    "source_title": "SitaRam editorial retelling (provenance unverified)",
+    "author_translator": "",
+    "publication_year": null,
+    "copyright_status": "unverified",
+    "source_url": "",
+    "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+    "reviewer_name": null,
+    "approval_date": null
+  }
+}

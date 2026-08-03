@@ -1,0 +1,36 @@
+{
+  "source_id": "sitaram_editorial_retelling_en",
+  "language": "en",
+  "kanda": "Kishkindha Kanda",
+  "kandaId": "kishkindha_kanda",
+  "chapter_number": 1,
+  "chapter_title_english": "Alliance with the Monkeys",
+  "chapter_title_bangla": "বানর রাজত্বে মৈত্রী",
+  "english_text": "Rama reached the Pampa lake, grieving for Sita. There he met Hanuman, the minister of Sugriva, the exiled monkey king. Sugriva and Rama formed a sacred alliance: Rama promised to help Sugriva regain his kingdom from his brother Vali, and Sugriva pledged the monkey army to search for Sita across the world.",
+  "short_summary_english": "Rama meets Hanuman and forms a sacred alliance with Sugriva to search for Sita.",
+  "moral_lesson_english": "True friendship is based on mutual support, trust, and alignment in righteousness (dharma).",
+  "characters": [
+    "Rama",
+    "Lakshmana",
+    "Hanuman",
+    "Sugriva"
+  ],
+  "themes": [
+    "friendship",
+    "alliance",
+    "dharma"
+  ],
+  "source_title": "SitaRam editorial retelling (provenance unverified)",
+  "source_status": "unverified",
+  "review_status": "needs_review",
+  "source_metadata": {
+    "source_title": "SitaRam editorial retelling (provenance unverified)",
+    "author_translator": "",
+    "publication_year": null,
+    "copyright_status": "unverified",
+    "source_url": "",
+    "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+    "reviewer_name": null,
+    "approval_date": null
+  }
+}
