@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import re
 import argparse
 import glob
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "validation"))
+import corpus_rules
 
 def clean_word(word):
     return re.sub(r'[^\w\s]', '', word).lower()
@@ -11,19 +15,29 @@ def clean_word(word):
 def build_search_index(records_dir, output_file):
     pattern = os.path.join(records_dir, "*.json")
     files = glob.glob(pattern)
-    
+
     # Simple inverted index: word -> list of sarga IDs
     index = {}
-    
+    indexed = 0
+    withheld = 0
+
     for file_path in files:
         with open(file_path, 'r', encoding='utf-8') as f:
             try:
                 record = json.load(f)
             except Exception:
                 continue
+
+            # Unverified or placeholder content must never become retrievable
+            # by the AI backend.
+            if not corpus_rules.is_retrieval_eligible(record):
+                withheld += 1
+                continue
+            indexed += 1
+
             doc_id = record.get("documentId")
             source_text = record.get("sourceText", "")
-            
+
             words = source_text.split()
             seen_words = set()
             for w in words:
@@ -40,7 +54,10 @@ def build_search_index(records_dir, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
         
-    print(f"Generated search index containing {len(index)} terms at '{output_file}'.")
+    print(
+        f"Generated search index containing {len(index)} terms from {indexed} retrieval-approved "
+        f"record(s) at '{output_file}' ({withheld} unverified record(s) withheld)."
+    )
 
 def main():
     parser = argparse.ArgumentParser(description="Build inverted keyword search index for local offline search.")

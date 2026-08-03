@@ -82,7 +82,16 @@ class SettingsScreen extends ConsumerWidget {
               data: (report) {
                 final imported = report['sargasImported'] ?? 0;
                 final expected = report['sargasExpected'] ?? 645;
+                final verified = report['sargasTextVerified'] ?? 0;
                 final pct = report['languages']?[currentLocale.languageCode]?['coveragePercent'] ?? 0.0;
+                // Edition provenance is read from the generated coverage report, never
+                // hardcoded: no edition may be credited until a Sarga from it is verified.
+                final editions = (report['provenance']?['editions'] as List?)?.join(', ') ?? '';
+                final editionLine = verified == 0
+                    ? (editions.isEmpty
+                        ? 'Edition: none verified yet'
+                        : 'Edition: $editions (registered, not yet verified)')
+                    : 'Edition: $editions';
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -92,7 +101,12 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Edition: Manmatha Nath Dutt (Public Domain)',
+                      'Human-verified: $verified / $expected',
+                      style: const TextStyle(color: AppTheme.softCreamText, fontSize: 12),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      editionLine,
                       style: const TextStyle(color: AppTheme.textDimMaroon, fontSize: 11),
                     ),
                     const SizedBox(height: 10),
@@ -189,7 +203,7 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => _showInfoDialog(
                     context, 
                     'Source & Copyright', 
-                    'The primary source used in the SitaRam application is the translation of the Valmiki Ramayana by Manmatha Nath Dutt, originally published in 1891 and now in the public domain. All summaries and moral insights are human-reviewed to match exact canonical Sargas.'
+                    'The Manmatha Nath Dutt translation of the Valmiki Ramayana (1891, public domain) is the registered source edition for this project, but no Sarga from it has been ingested or verified yet. The chapters currently in the app are editorial retellings of unverified provenance, shown with their review status. They are not attributed to any translator and are excluded from AI retrieval until a human reviewer verifies them against the source edition. See Corpus Coverage Status above for exact verified counts.'
                   ),
                 ),
                 const Divider(color: Colors.white10, height: 1),

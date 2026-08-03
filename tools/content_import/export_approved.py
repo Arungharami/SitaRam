@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import argparse
 import glob
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "validation"))
+import corpus_rules
 
 def export_approved(output_file):
     base_dir = os.path.dirname(__file__)
@@ -12,13 +16,13 @@ def export_approved(output_file):
     files = glob.glob(pattern)
     
     approved_list = []
+    skipped = []
     for file_path in files:
         with open(file_path, 'r', encoding='utf-8') as f:
             record = json.load(f)
-        status = record.get("review", {}).get("status", "raw_import")
-        # In a real environment, we'd check for "approved_for_app" or "approved_for_retrieval"
-        # Since we're bootstrap loading, we'll allow exporting for this step or let it default.
-        if status in ["approved_for_app", "approved_for_retrieval", "raw_import"]:
+        status = corpus_rules.declared_status(record)
+        reasons = []
+        if corpus_rules.is_app_eligible(record, reasons):
             # Convert to production mobile schema format if required
             prod_record = {
                 "id": record["documentId"],
@@ -68,12 +72,16 @@ def export_approved(output_file):
                 }
             }
             approved_list.append(prod_record)
-            
+        else:
+            skipped.append(reasons[0] if reasons else f"{record.get('documentId')}: not app-eligible")
+
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(approved_list, f, indent=2, ensure_ascii=False)
-        
-    print(f"Exported {len(approved_list)} approved/import chapters to '{output_file}'.")
+
+    for reason in skipped:
+        print(f"Skipped (not approved for app): {reason}")
+    print(f"Exported {len(approved_list)} app-approved chapters to '{output_file}' ({len(skipped)} withheld).")
 
 def main():
     parser = argparse.ArgumentParser(description="Export approved Sargas to Flutter app assets.")

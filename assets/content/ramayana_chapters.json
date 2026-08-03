@@ -28,9 +28,11 @@
       "abduction",
       "vigilance"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "aranya_kanda_005",
       "language": "en",
@@ -48,14 +50,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -87,9 +89,11 @@
       "sacrifice",
       "dharma"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "ayodhya_kanda_004",
       "language": "en",
@@ -107,14 +111,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -144,9 +148,11 @@
       "virtue",
       "truth"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "bala_kanda_001",
       "language": "en",
@@ -164,14 +170,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -200,9 +206,11 @@
       "poetry",
       "dharma"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "bala_kanda_002",
       "language": "en",
@@ -220,14 +228,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -257,9 +265,11 @@
       "destiny",
       "inspiration"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "bala_kanda_003",
       "language": "en",
@@ -277,14 +287,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -315,9 +325,11 @@
       "alliance",
       "dharma"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "kishkindha_kanda_007",
       "language": "en",
@@ -335,14 +347,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -372,9 +384,11 @@
       "faith",
       "courage"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "sundara_kanda_006",
       "language": "en",
@@ -392,14 +406,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -431,9 +445,11 @@
       "peace",
       "legacy"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "uttara_kanda_009",
       "language": "en",
@@ -451,14 +467,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   },
   {
@@ -491,9 +507,11 @@
       "war",
       "justice"
     ],
-    "sourceTitle": "Valmiki Ramayana (Production Refined)",
-    "sourceStatus": "public_domain_or_user_verified",
-    "reviewStatus": "approved_for_app",
+    "sourceTitle": "SitaRam editorial retelling (provenance unverified)",
+    "sourceStatus": "unverified",
+    "reviewStatus": "needs_review",
+    "translationReviewStatus": "needs_native_review",
+    "verified": false,
     "audioEnglish": {
       "chapter_id": "yuddha_kanda_008",
       "language": "en",
@@ -511,14 +529,14 @@
       "status": "placeholder"
     },
     "source_metadata": {
-      "source_title": "Valmiki Ramayana (Production Refined)",
-      "author_translator": "M. N. Dutt (Public Domain)",
-      "publication_year": 1891,
-      "copyright_status": "public_domain_or_user_verified",
-      "source_url": "https://archive.org/details/valmikiramayana",
-      "notes": "Verified against public domain text.",
-      "reviewer_name": "SitaRam QA Team",
-      "approval_date": "2026-06-10"
+      "source_title": "SitaRam editorial retelling (provenance unverified)",
+      "author_translator": "",
+      "publication_year": null,
+      "copyright_status": "unverified",
+      "source_url": "",
+      "notes": "Editorial narrative retelling, not verbatim source-edition text. Requires human verification against the registered public-domain edition before approval.",
+      "reviewer_name": null,
+      "approval_date": null
     }
   }
 ]

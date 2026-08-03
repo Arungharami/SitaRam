@@ -40,11 +40,16 @@ def main():
         
         en_status = en_data.get("review_status", "needs_review")
         bn_status = bn_data.get("review_status", "needs_native_review")
-        
-        if args.release:
-            if en_status != "approved_for_app" or bn_status != "approved_for_app":
-                print(f"Skipping {chapter_id} (not approved)")
-                continue
+
+        # A chapter is only "verified" when a human has approved both the
+        # English text and the Bangla translation. Everything else ships (if at
+        # all) explicitly flagged as unverified so no UI or AI surface can
+        # present it as confirmed scripture.
+        verified = en_status == "approved_for_app" and bn_status == "approved_for_app"
+
+        if args.release and not verified:
+            print(f"Skipping {chapter_id} (not approved: en={en_status}, bn={bn_status})")
+            continue
 
         # Formulate Audio Detail structures
         audio_en = {
@@ -89,7 +94,9 @@ def main():
             "sourceTitle": en_data.get("source_title", ""),
             "sourceStatus": en_data.get("source_status", ""),
             "reviewStatus": en_status,
-            
+            "translationReviewStatus": bn_status,
+            "verified": verified,
+
             # Audio pipelines
             "audioEnglish": audio_en,
             "audioBangla": audio_bn,
@@ -98,7 +105,7 @@ def main():
             "source_metadata": en_data.get("source_metadata", {})
         }
         compiled_chapters.append(merged)
-        print(f"Merged & Compiled: {chapter_id}")
+        print(f"Merged & Compiled: {chapter_id} (verified={verified})")
 
     # Ensure output folder
     output_dir = os.path.dirname(output_file)
@@ -108,7 +115,11 @@ def main():
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(compiled_chapters, f, indent=2, ensure_ascii=False)
 
-    print(f"[Step 5] Finished. Exported {len(compiled_chapters)} chapters to '{output_file}'.")
+    verified_count = sum(1 for c in compiled_chapters if c["verified"])
+    print(
+        f"[Step 5] Finished. Exported {len(compiled_chapters)} chapters to '{output_file}' "
+        f"({verified_count} verified, {len(compiled_chapters) - verified_count} flagged unverified)."
+    )
 
 if __name__ == "__main__":
     main()

@@ -20,9 +20,17 @@ graph TD
 ### Review Statuses
 1. `raw_ocr`: The text has just been extracted from the PDF pages or images.
 2. `cleaned`: Running headers, page numbers, and formatting artifacts have been stripped.
-3. `needs_review` / `needs_native_review` (Bangla): Text is split into chapters but has not been checked by a reviewer.
-4. `reviewed`: Checked by a reviewer for typos and readability.
-5. `approved_for_app`: Fully approved and ready to be compiled into the final release bundle.
+3. `segmented`: Pages have been split into chapter units. Segmentation is not review.
+4. `needs_review` / `needs_native_review` (Bangla): Text is split into chapters but has not been checked by a reviewer.
+5. `reviewed`: Checked by a reviewer for typos and readability.
+6. `approved_for_retrieval`: Cleared for use as AI grounding evidence.
+7. `approved_for_app`: Fully approved and ready to be compiled into the final release bundle.
+
+> **No script sets an approved status.** `split_chapters.py` emits `needs_review` /
+> `needs_native_review` only. Promotion to `approved_for_retrieval` or `approved_for_app`
+> is a human action and must record a reviewer name and review date. Validation
+> (`python ../validation/run_all.py`) rejects approval claims that lack real text,
+> provenance, or reviewer attribution.
 
 ---
 
@@ -53,11 +61,11 @@ python3 clean_text.py
 *Transitions page status from `raw_ocr` to `cleaned`.*
 
 ### Step 4: Split into Chapters
-Aggregates all `cleaned` pages and splits them into individual chapter JSON files. This also creates corresponding Bangla translation templates.
+Writes individual chapter JSON files (and matching Bangla templates) from `data/chapters_source.json`.
 ```bash
 python3 split_chapters.py
 ```
-*Output: Chapters in `data/chapters/en_...json` and `bn_...json`.*
+*Output: Chapters in `data/chapters/en_...json` and `bn_...json`, all as `needs_review`.*
 
 ### Step 5: Manual Review & Bangla Translation
 Before compiling, open the files in `data/chapters/` to review, add translations, and change statuses.

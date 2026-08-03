@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import os
+import sys
 import json
 import argparse
 import glob
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "validation"))
+import corpus_rules
 
 def build_embeddings(records_dir, output_file, model_name):
     # In production, this would import sentence_transformers and build embeddings.
@@ -12,7 +16,8 @@ def build_embeddings(records_dir, output_file, model_name):
     files = glob.glob(pattern)
     
     embeddings_data = []
-    
+    withheld = 0
+
     print(f"Loading embedding model: {model_name}...")
     try:
         from sentence_transformers import SentenceTransformer
@@ -28,9 +33,15 @@ def build_embeddings(records_dir, output_file, model_name):
                 record = json.load(f)
             except Exception:
                 continue
+
+            # Unverified or placeholder content must never enter the vector index.
+            if not corpus_rules.is_retrieval_eligible(record):
+                withheld += 1
+                continue
+
             doc_id = record.get("documentId")
             source_text = record.get("sourceText", "")
-            
+
             if use_real:
                 vector = model.encode(source_text).tolist()
             else:
@@ -48,7 +59,10 @@ def build_embeddings(records_dir, output_file, model_name):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(embeddings_data, f, indent=2, ensure_ascii=False)
         
-    print(f"Generated embeddings for {len(embeddings_data)} Sargas at '{output_file}'.")
+    print(
+        f"Generated embeddings for {len(embeddings_data)} retrieval-approved Sarga(s) at "
+        f"'{output_file}' ({withheld} unverified record(s) withheld)."
+    )
 
 def main():
     parser = argparse.ArgumentParser(description="Generate embeddings vectors for hybrid RAG search.")
