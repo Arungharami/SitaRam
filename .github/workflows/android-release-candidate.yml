@@ -1,0 +1,155 @@
+name: Android Release Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_to_internal_testing:
+        description: Upload the signed AAB to Google Play internal testing
+        required: true
+        type: boolean
+        default: false
+      release_notes:
+        description: Short internal release notes
+        required: false
+        type: string
+        default: Automated SitaRam release candidate
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sitaram-android-release
+  cancel-in-progress: false
+
+jobs:
+  build-release-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show tool versions
+        run: |
+          flutter --version
+          java -version
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Run static analysis
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        run: flutter test
+
+      - name: Validate required build secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          SITARAM_HF_ENDPOINT: ${{ secrets.SITARAM_HF_ENDPOINT }}
+          SITARAM_HF_APP_KEY: ${{ secrets.SITARAM_HF_APP_KEY }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD ANDROID_STORE_PASSWORD SITARAM_HF_ENDPOINT SITARAM_HF_APP_KEY; do
+            if [ -z "${!name:-}" ]; then
+              echo "Missing required GitHub Actions secret: $name" >&2
+              exit 1
+            fi
+          done
+          case "$SITARAM_HF_ENDPOINT" in
+            https://*) ;;
+            *) echo "SITARAM_HF_ENDPOINT must use HTTPS for a release build." >&2; exit 1 ;;
+          esac
+
+      - name: Validate Google Play upload secret
+        if: ${{ inputs.upload_to_internal_testing }}
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PLAY_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "Missing required GitHub Actions secret: PLAY_SERVICE_ACCOUNT_JSON" >&2
+            exit 1
+          fi
+
+      - name: Restore Android upload keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=$ANDROID_STORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=../upload-keystore.jks
+          EOF
+          chmod 600 android/upload-keystore.jks android/key.properties
+
+      - name: Build signed Android App Bundle
+        env:
+          SITARAM_HF_ENDPOINT: ${{ secrets.SITARAM_HF_ENDPOINT }}
+          SITARAM_HF_APP_KEY: ${{ secrets.SITARAM_HF_APP_KEY }}
+        run: |
+          flutter build appbundle --release \
+            --dart-define=SITARAM_HF_ENDPOINT="$SITARAM_HF_ENDPOINT" \
+            --dart-define=SITARAM_HF_APP_KEY="$SITARAM_HF_APP_KEY"
+
+      - name: Verify release artifact exists
+        run: |
+          test -s build/app/outputs/bundle/release/app-release.aab
+          sha256sum build/app/outputs/bundle/release/app-release.aab | tee build/app/outputs/bundle/release/app-release.aab.sha256
+
+      - name: Upload release-candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitaram-android-release-candidate
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/bundle/release/app-release.aab.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Prepare Google Play release notes
+        if: ${{ inputs.upload_to_internal_testing }}
+        env:
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+        run: |
+          set -euo pipefail
+          mkdir -p distribution/whatsnew
+          printf '%s\n' "$RELEASE_NOTES" > distribution/whatsnew/whatsnew-en-US
+
+      - name: Upload to Google Play internal testing
+        if: ${{ inputs.upload_to_internal_testing }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.leadai.sitaram
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: draft
+          releaseName: ${{ github.ref_name }}-${{ github.run_number }}
+          whatsNewDirectory: distribution/whatsnew
+
+      - name: Remove restored signing material
+        if: ${{ always() }}
+        run: rm -f android/upload-keystore.jks android/key.properties
