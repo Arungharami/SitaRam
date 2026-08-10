@@ -5,38 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy — SitaRam</title>
   <style>
-    :root {
-      --maroon: #2E0B04;
-      --saffron: #E65100;
-      --gold: #FFB300;
-      --cream: #FFF8F0;
-      --dim: #9E6B50;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--maroon); color: var(--cream); font-family: Georgia, serif; }
-    header {
-      text-align: center;
-      padding: 36px 24px 24px;
-      background: linear-gradient(180deg, #1a0602 0%, #2E0B04 100%);
-      border-bottom: 1px solid #FFB30030;
-    }
-    header h1 { font-size: 1.8rem; color: var(--gold); letter-spacing: 3px; }
-    header p { color: var(--dim); margin-top: 6px; font-size: 0.9rem; }
-    nav { display: flex; justify-content: center; gap: 24px; padding: 14px; background: #1a0602; }
-    nav a { color: var(--gold); text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; }
-    nav a:hover { text-decoration: underline; }
-    main { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
-    h2 { color: var(--gold); font-size: 1.15rem; margin: 32px 0 10px; border-bottom: 1px solid #FFB30025; padding-bottom: 6px; }
-    p, li { color: var(--dim); line-height: 1.85; margin-bottom: 10px; font-size: 0.98rem; }
-    ul { padding-left: 20px; margin-bottom: 10px; }
-    strong { color: var(--cream); }
-    .updated { color: var(--dim); font-size: 0.85rem; margin-bottom: 32px; }
-    a { color: var(--gold); }
-    footer { text-align: center; padding: 28px; color: var(--dim); font-size: 0.82rem; border-top: 1px solid #FFB30020; }
+    :root { --maroon:#2E0B04; --saffron:#E65100; --gold:#FFB300; --cream:#FFF8F0; --dim:#C7A995; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--maroon); color:var(--cream); font-family:Georgia,serif; }
+    header { text-align:center; padding:36px 24px 24px; background:linear-gradient(180deg,#1a0602 0%,#2E0B04 100%); border-bottom:1px solid #FFB30030; }
+    header h1 { font-size:1.8rem; color:var(--gold); letter-spacing:3px; }
+    header p { color:var(--dim); margin-top:6px; font-size:.9rem; }
+    nav { display:flex; justify-content:center; gap:24px; padding:14px; background:#1a0602; }
+    nav a { color:var(--gold); text-decoration:none; font-size:.85rem; letter-spacing:1px; }
+    main { max-width:760px; margin:0 auto; padding:40px 24px 80px; }
+    h2 { color:var(--gold); font-size:1.15rem; margin:32px 0 10px; border-bottom:1px solid #FFB30025; padding-bottom:6px; }
+    p,li { color:var(--dim); line-height:1.8; margin-bottom:10px; font-size:.98rem; }
+    ul { padding-left:20px; margin-bottom:10px; }
+    strong { color:var(--cream); }
+    .updated { color:var(--dim); font-size:.85rem; margin-bottom:32px; }
+    a { color:var(--gold); }
+    footer { text-align:center; padding:28px; color:var(--dim); font-size:.82rem; border-top:1px solid #FFB30020; }
   </style>
 </head>
 <body>
-
 <header>
   <h1>🪔 SitaRam</h1>
   <p>Privacy Policy</p>
@@ -45,56 +32,54 @@
   <a href="index.html">← Home</a>
   <a href="terms.html">Terms</a>
 </nav>
-
 <main>
-  <p class="updated"><strong>Last Updated:</strong> June 17, 2026 &nbsp;|&nbsp; <strong>App:</strong> SitaRam – Valmiki Ramayana &nbsp;|&nbsp; <strong>Developer:</strong> Lead.AI Labs</p>
+  <p class="updated"><strong>Last updated:</strong> August 10, 2026 &nbsp;|&nbsp; <strong>Package:</strong> com.leadai.sitaram &nbsp;|&nbsp; <strong>Developer:</strong> Lead.AI Labs</p>
 
-  <h2>1. Information We Collect</h2>
-  <p><strong>We do not collect any personal information.</strong></p>
-  <p>SitaRam does not require account creation, login, or registration of any kind.</p>
-  <p>The following data is stored <strong>locally on your device only</strong> and never transmitted to our servers:</p>
+  <h2>1. Overview</h2>
+  <p>SitaRam is a Ramayana study application with local app preferences and optional online AI and feedback features. SitaRam does not require an account for the current app experience and does not use advertising SDKs in the current release.</p>
+
+  <h2>2. Information stored on your device</h2>
+  <p>The app may store settings and preferences locally on your device, such as language selection and other app-state preferences required for the experience.</p>
+
+  <h2>3. AI Guide data</h2>
+  <p>When you use the AI Guide, the question you enter and technical request information needed to process the request are transmitted over HTTPS to the SitaRam backend.</p>
+  <p>The backend may be hosted by a third-party infrastructure provider and may use an AI model or AI service configured by the developer. Those providers may process request content as necessary to provide the AI feature.</p>
+  <p><strong>Do not submit passwords, financial information, government identifiers, health records, or other sensitive personal information in AI questions.</strong></p>
+
+  <h2>4. Feedback and reports</h2>
+  <p>If you submit AI feedback or report a response, the selected rating or reason and any comment you choose to provide are transmitted to the SitaRam backend so the report can be reviewed and used to improve safety and accuracy.</p>
+
+  <h2>5. Permissions</h2>
+  <p>The current Android release requests internet access so online AI and feedback features can communicate with the SitaRam backend.</p>
+  <p>The current release does not request access to your precise location, contacts, camera, microphone, or advertising identifier through the Android manifest.</p>
+
+  <h2>6. Data use</h2>
   <ul>
-    <li>Your <strong>Gemini API key</strong> (if you choose to enter one) — stored in device SharedPreferences, never sent to Lead.AI Labs</li>
-    <li>Your <strong>personal reflection notes</strong> — stored locally, never uploaded</li>
-    <li>Your <strong>app language preference</strong> — stored locally</li>
+    <li>Provide the requested AI response.</li>
+    <li>Validate and improve answer quality and citation safety.</li>
+    <li>Process user feedback and safety reports.</li>
+    <li>Maintain security, reliability, and abuse prevention for the service.</li>
   </ul>
+  <p><strong>SitaRam does not sell user data.</strong></p>
 
-  <h2>2. AI Guide (Optional)</h2>
-  <p>If you configure a Gemini API key, your research questions are sent <strong>directly from your device to Google's Gemini API</strong>. SitaRam does not proxy, store, log, or see these queries in any way.</p>
-  <p>Please review Google's Privacy Policy: <a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a></p>
+  <h2>7. Third-party services</h2>
+  <p>Production deployments may rely on third-party hosting and AI infrastructure, including Hugging Face or other providers selected by the developer. Their handling of data is also governed by their applicable terms and privacy policies.</p>
+  <p>Google Play also processes information related to app distribution, installation, and Play services under Google's policies.</p>
 
-  <h2>3. Information We Do NOT Collect</h2>
-  <ul>
-    <li>No names, email addresses, or contact information</li>
-    <li>No location data</li>
-    <li>No device identifiers or advertising IDs</li>
-    <li>No analytics or usage tracking</li>
-    <li>No crash reporting sent to our servers</li>
-    <li>No payment or financial information</li>
-  </ul>
+  <h2>8. Data retention and security</h2>
+  <p>SitaRam aims to minimize server-side collection and uses HTTPS for production AI requests. Operational infrastructure may retain limited logs needed for security, reliability, troubleshooting, or abuse prevention.</p>
 
-  <h2>4. Third-Party Services</h2>
-  <ul>
-    <li><strong>Google Gemini API</strong> — only if the user provides their own API key; governed by Google's privacy policy</li>
-    <li><strong>Google Play</strong> — distribution platform; governed by Google's policies</li>
-  </ul>
+  <h2>9. Children's privacy</h2>
+  <p>Users should not submit personal information about children through AI questions or feedback. If the app is distributed to children or included in a child-directed audience, the developer must complete the applicable Google Play Families and privacy requirements before publication.</p>
 
-  <h2>5. Children's Privacy</h2>
-  <p>SitaRam does not knowingly collect information from children under 13. The app contains no inappropriate content and is suitable for all ages.</p>
+  <h2>10. Changes to this policy</h2>
+  <p>This policy may be updated when app features, service providers, or data practices change. The date at the top of this page will be updated when material changes are made.</p>
 
-  <h2>6. Data Security</h2>
-  <p>All user data is stored locally on the device using Android's SharedPreferences. No data is transmitted to Lead.AI Labs servers at any time.</p>
-
-  <h2>7. Changes to This Policy</h2>
-  <p>We may update this Privacy Policy. The updated date at the top of this page will reflect any changes. Continued use of the app after changes constitutes acceptance.</p>
-
-  <h2>8. Contact</h2>
-  <p>For questions about this privacy policy, contact us at: <a href="mailto:a.gharami.325@westcliff.edu">a.gharami.325@westcliff.edu</a></p>
+  <h2>11. Contact</h2>
+  <p>For privacy questions or requests, contact: <a href="mailto:a.gharami.325@westcliff.edu">a.gharami.325@westcliff.edu</a></p>
 </main>
-
 <footer>
   &copy; 2026 Lead.AI Labs · SitaRam · <a href="index.html">Home</a> · <a href="terms.html">Terms</a>
 </footer>
-
 </body>
 </html>

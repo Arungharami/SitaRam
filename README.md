@@ -1,124 +1,131 @@
-# SitaRam — Valmiki Ramayana Reader & AI Research App
+# SitaRam — Valmiki Ramayana Study & AI Research App
 
-SitaRam is a devotional and research mobile application designed for clean reading, listening, language study (English, Bangla, Spanish), and source-grounded AI scriptural study of the Valmiki Ramayana.
+SitaRam is an open-source Flutter application for respectful Ramayana study, source review, multilingual reading workflows, and evidence-grounded AI assistance.
 
----
+> **Content status matters:** SitaRam does not treat imported text as verified scripture automatically. The committed coverage report is the source of truth for what has been imported, human-verified, approved for the app, and approved for AI retrieval.
 
-## 🪷 System Architecture & Hybrid RAG
+## Current project status
 
-SitaRam integrates a client Flutter mobile app with a Python FastAPI RAG backend hosted on a Hugging Face Space.
+- Android package: `com.leadai.sitaram`
+- Flutter app with English, Bangla, and Spanish UI support
+- Seven-Kanda navigation structure
+- Corpus validation and provenance gates
+- AI Guide with no-evidence behavior and citation safeguards
+- In-app AI feedback/reporting flow
+- Signed Android App Bundle release workflow for Google Play internal testing
+- Google Play release runbook and policy checklist
 
-- **Offline-First Reading**: Local compiled databases allow full offline scripture reading, notes, and study tracking.
-- **Source-Grounded AI**: The AI Guide answers user questions by retrieving relevant passages using hybrid vector + keyword (BM25) search.
-- **Safety Refusals**: Strict guardrails prevent the AI from inventing Sanskrit verses, predicting future fortunes, or claiming religious authority.
+The current committed corpus is **not complete**. Do not advertise SitaRam as a complete or fully verified Valmiki Ramayana edition until `assets/content/coverage_report.json` reports that status.
 
----
+## Trust model
 
-## 🚀 Getting Started
+SitaRam separates four states that must not be confused:
 
-### Prerequisites
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) (stable channel)
-- [Python 3.9+](https://www.python.org/downloads/) (for the content import pipeline)
+1. **Imported** — a record exists in the corpus.
+2. **Human-verified** — source text has been checked against the registered edition.
+3. **Approved for app** — the record may be shown as approved content in the mobile app.
+4. **Approved for retrieval** — the record may be used as grounding evidence by the AI system.
 
-### Installation & Run
+Unverified or placeholder records are excluded from trusted AI retrieval. When approved evidence is unavailable, the AI Guide is expected to return a clear no-evidence response instead of inventing scripture, quotations, verse numbers, or citations.
 
-1. Fetch Flutter packages:
-   ```bash
-   flutter pub get
-   ```
-2. Build and run the app locally:
-   ```bash
-   flutter run \
-     --dart-define=SITARAM_HF_ENDPOINT=https://YOUR-SPACE.hf.space \
-     --dart-define=SITARAM_HF_APP_KEY=YOUR_SECRET_APP_KEY
-   ```
+## Architecture
 
----
+### Flutter mobile app
 
-## 🛠️ Content Ingestion Pipeline (`tools/`)
+The client provides the reading/study interface, language controls, corpus coverage status, AI Guide, citations, and feedback controls.
 
-Scriptural data is processed and registered using python scripts under `tools/`.
+### FastAPI AI backend
 
-### 1. Ingestion Sequence
-1. **Register Source Edition**:
-   ```bash
-   python tools/content_import/register_source.py
-   ```
-2. **Segment Kandas**:
-   ```bash
-   python tools/content_import/split_kandas.py --file raw_corpus.txt
-   ```
-3. **Segment Sargas**:
-   ```bash
-   python tools/content_import/split_sargas.py --file bala_kanda.txt --kanda-id bala_kanda
-   ```
-4. **Normalize & Clean OCR Noise**:
-   ```bash
-   python tools/content_import/normalize_text.py
-   ```
-5. **Generate Schema Records**:
-   ```bash
-   python tools/content_import/generate_records.py
-   ```
-6. **Compile Search Index & Embeddings**:
-   ```bash
-   python tools/indexing/build_search_index.py
-   python tools/indexing/build_embeddings.py
-   ```
-7. **Validate Schema & Provenance**:
-   ```bash
-   python tools/validation/validate_schema.py
-   python tools/validation/check_duplicates.py
-   python tools/validation/check_numbering.py
-   python tools/validation/check_provenance.py
-   ```
-8. **Export Approved Assets**:
-   ```bash
-   python tools/content_import/export_approved.py
-   ```
+The backend under `huggingface_space/` provides health, coverage, search, ask, citation-verification, and feedback endpoints. Production deployments must use HTTPS and owner-managed configuration. Secrets and signing credentials must never be committed to the repository.
 
----
+### Corpus pipeline
 
-## 🐳 Hugging Face Space Deployment
+Content tools under `tools/` handle source registration, segmentation, normalization, schema generation, validation, indexing, and export. Shared eligibility rules prevent a simple status edit from promoting unverified text into trusted app or retrieval content.
 
-The RAG backend is packaged inside a Docker container for deployment to a Hugging Face Space.
+## Validate the corpus
 
-### 1. Environment Variables (Space Secrets)
-- `SITARAM_APP_KEY`: secret key matching client app compile token.
-- `MODEL_ID`: `Qwen/Qwen2.5-1.5B-Instruct`
-- `HF_TOKEN`: Hugging Face authorization token.
-- `MAX_CONTEXT_PASSAGES`: default `6`
+Run the master validation suite before any content release:
 
-### 2. Local Backend Run
 ```bash
-cd huggingface_space
-pip install -r requirements.txt
-uvicorn app:app --host 0.0.0.0 --port 7860 --reload
+python tools/validation/run_all.py
+python tools/validation/test_corpus_validation.py
+python tools/validation/verify_text_integrity.py --baseline <trusted-baseline-ref>
+python tools/content_import/validate_json.py
 ```
 
----
+For pull requests targeting `main`, use `origin/main` as the trusted baseline after fetching the full branch history.
 
-## 🗺️ 7-Kanda Roadmap
+Then inspect:
 
-1. **Bala Kanda**: Complete verified English translations, Bangla stubs, and audio tracks.
-2. **Ayodhya Kanda**: Sarga segmentation, moral insights compilation.
-3. **Aranya Kanda**: Forest adventures sarga parsing, demon encounters tagging.
-4. **Kishkindha Kanda**: Alliance with monkeys, character network mappings.
-5. **Sundara Kanda**: Hanuman's crossing, Lanka search details.
-6. **Yuddha Kanda**: War preparations, defeat of Ravana.
-7. **Uttara Kanda**: Coronation, return to absolute source.
+```text
+assets/content/coverage_report.json
+```
 
----
+Store-listing and marketing claims must match that generated report.
 
-## 📜 Legal and Safety Policy
+## Run the Flutter app
 
-- **Disclaimer**: AI outputs are educational reflections, not spiritual or religious decrees.
-- **Copyright Policy**: We utilize verified public domain translations (like Manmatha Nath Dutt, 1891).
-- **Abuse Prevention**: Rate limits, input size checks, and token security enforce API longevity.
+```bash
+flutter pub get
+flutter analyze
+flutter test
+flutter run \
+  --dart-define=SITARAM_HF_ENDPOINT=https://YOUR-HTTPS-ENDPOINT \
+  --dart-define=SITARAM_HF_APP_KEY=YOUR-APP-TOKEN
+```
 
----
+The client token is an application access control, not a substitute for server-side abuse protection. Production backends should also use rate limiting, monitoring, and least-privilege infrastructure credentials.
 
-## 🤝 Contribution Process
-Contributions are welcome. Please ensure new Sargas are registered under `tools/content_import/register_source.py` and successfully pass all validation gate scripts prior to creating a pull request.
+## Google Play release
+
+The repository includes a manually triggered workflow:
+
+```text
+.github/workflows/android-release-candidate.yml
+```
+
+It can:
+
+- run Flutter analysis and tests;
+- restore the upload keystore from GitHub Actions secrets;
+- build a signed AAB;
+- record the AAB SHA-256 checksum;
+- retain the release artifact;
+- optionally upload a **draft** release to Google Play internal testing.
+
+Release guidance:
+
+- `docs/PLAY_STORE_RELEASE_RUNBOOK.md`
+- `docs/PLAY_PRODUCTION_CHECKLIST_2026.md`
+- `docs/store_listing_en.md`
+- `docs/privacy_policy_draft.md`
+
+Production rollout remains an explicit account-owner action after testing, policy declarations, and store review are complete.
+
+## Content contribution rules
+
+Contributions that add or modify Ramayana content must preserve source provenance and pass the corpus validation gates. Do not:
+
+- invent missing scripture text;
+- fabricate reviewer names or approval dates;
+- attribute text to a translator without source evidence;
+- mark placeholder content as verified;
+- add unverified passages to retrieval indexes;
+- make completeness claims unsupported by the generated coverage report.
+
+## AI safety principles
+
+SitaRam AI is an educational study assistant, not a religious authority. The system is designed to:
+
+- prefer source-grounded answers;
+- expose citations only for approved passages;
+- label AI interpretation;
+- refuse unsupported or unsafe requests;
+- allow users to report incorrect or inappropriate AI output;
+- return no-evidence responses when trusted source material is unavailable.
+
+## Contributing
+
+Pull requests are welcome. Keep changes focused, run the relevant Flutter/backend/corpus tests, and explain any content provenance or release impact in the PR description.
 
 **Jai Shri Ram**

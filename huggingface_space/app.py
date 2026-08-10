@@ -3,56 +3,61 @@ import re
 import json
 import logging
 from typing import List, Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, Header, Request, status
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException, Header, status
+from pydantic import BaseModel
 
-# Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("sitaram-ai-backend")
 
 app = FastAPI(title="SitaRam Ramayana AI API", version="1.0.0")
 
-# Load environment configuration
-SITARAM_APP_KEY = os.getenv("SITARAM_APP_KEY", "sitaram_secret_key_108")
+# Production must fail closed if the application access token is not configured.
+# Never ship a publicly committed fallback token.
+SITARAM_APP_KEY = os.getenv("SITARAM_APP_KEY")
+if not SITARAM_APP_KEY:
+    raise RuntimeError(
+        "SITARAM_APP_KEY is required. Configure it as a deployment secret before starting the backend."
+    )
+
 MODEL_ID = os.getenv("MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct")
 MAX_CONTEXT_PASSAGES = int(os.getenv("MAX_CONTEXT_PASSAGES", "6"))
 
-# Load mock dataset locally for space verification and local fallbacks
-assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets", "content"))
+assets_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "assets", "content")
+)
 all_chapters = []
 sargas_db = []
 
 
 def is_verified_passage(chapter):
-    """
-    Retrieval trust gate. A passage is only usable as grounding evidence when the
-    exporter marked it verified AND its review status says approved_for_app.
-    Chapters missing the flag are treated as unverified: absence of a claim is
-    never treated as approval.
-    """
-    return chapter.get("verified") is True and chapter.get("reviewStatus") == "approved_for_app"
+    """Return True only for passages explicitly verified and approved for app use."""
+    return (
+        chapter.get("verified") is True
+        and chapter.get("reviewStatus") == "approved_for_app"
+    )
 
 
 try:
     chapters_path = os.path.join(assets_dir, "ramayana_chapters.json")
     if os.path.exists(chapters_path):
-        with open(chapters_path, 'r', encoding='utf-8') as f:
+        with open(chapters_path, "r", encoding="utf-8") as f:
             all_chapters = json.load(f)
-        # Unverified content is never placed in the retrieval corpus, so the AI
-        # cannot quote or cite it as scripture.
         sargas_db = [c for c in all_chapters if is_verified_passage(c)]
         logger.info(
-            f"Loaded {len(all_chapters)} chapters; {len(sargas_db)} are verified and "
-            f"retrieval-eligible ({len(all_chapters) - len(sargas_db)} withheld as unverified)."
+            "Loaded %s chapters; %s are verified and retrieval-eligible (%s withheld as unverified).",
+            len(all_chapters),
+            len(sargas_db),
+            len(all_chapters) - len(sargas_db),
         )
-except Exception as e:
-    logger.error(f"Error loading Sargas database: {e}")
+except Exception as exc:
+    logger.error("Error loading Sargas database: %s", exc)
 
-# Request and Response schemas
+
 class SearchRequest(BaseModel):
     query: str
     limit: int = 5
     filters: Optional[Dict[str, Any]] = None
+
 
 class AskRequest(BaseModel):
     question: str
@@ -61,17 +66,18 @@ class AskRequest(BaseModel):
     filters: Optional[Dict[str, Any]] = None
     conversationId: Optional[str] = ""
 
+
 class FeedbackRequest(BaseModel):
     feedbackId: str
     questionId: str
     answerId: str
-    rating: str # "helpful" or "unhelpful"
+    rating: str
     reason: str
     userComment: Optional[str] = ""
     reportedPassageId: Optional[str] = ""
     language: str = "en"
 
-# Safety refusal checks
+
 REFUSAL_TRIGGERS = [
     r"(?i)invent\s+(?:a\s+)?sanskrit\s+verse",
     r"(?i)predict\s+(?:my\s+)?(?:future|marriage|death|wealth)",
@@ -81,41 +87,51 @@ REFUSAL_TRIGGERS = [
     r"(?i)insult\s+religion",
 ]
 
-def check_safety(text: str) -> bool:
-    for trigger in REFUSAL_TRIGGERS:
-        if re.search(trigger, text):
-            return True
-    return False
 
-# Citation validation
-def verify_citations(answer: str, context_passages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def check_safety(text: str) -> bool:
+    return any(re.search(trigger, text) for trigger in REFUSAL_TRIGGERS)
+
+
+def verify_citations(
+    answer: str, context_passages: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+    """Build citation metadata only from the approved passage itself.
+
+    Source/translator information is never hardcoded because future approved
+    passages may come from different registered editions.
+    """
     citations = []
-    # Verify that facts matching Kanda and Sarga can be found
     for passage in context_passages:
-        doc_id = passage.get("id")
-        kanda = passage.get("kanda", "")
-        sarga = passage.get("chapterNumber", 0)
+        metadata = passage.get("source_metadata") or {}
+        source_title = (
+            passage.get("sourceTitle")
+            or metadata.get("source_title")
+            or "Approved source"
+        )
+        translator = metadata.get("author_translator") or ""
         text = passage.get("englishText", "")
-        
-        # Simple citation check: if passage key terms appear in answer or simply cite context
-        citations.append({
-            "documentId": doc_id,
-            "kanda": kanda,
-            "sarga": sarga,
-            "edition": "M. N. Dutt (Public Domain)",
-            "translator": "Manmatha Nath Dutt",
-            "contentType": "source_text",
-            "quotedText": text[:150] + "..." if len(text) > 150 else text
-        })
+
+        citations.append(
+            {
+                "documentId": passage.get("id"),
+                "kanda": passage.get("kanda", ""),
+                "sarga": passage.get("chapterNumber", 0),
+                "edition": source_title,
+                "translator": translator,
+                "contentType": "source_text",
+                "quotedText": text[:150] + "..." if len(text) > 150 else text,
+            }
+        )
     return citations
 
-# Security check middleware
+
 def verify_app_key(x_sitaram_key: Optional[str] = Header(None)):
     if x_sitaram_key != SITARAM_APP_KEY:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing X-SitaRam-Key header token."
+            detail="Invalid or missing X-SitaRam-Key header token.",
         )
+
 
 @app.get("/health")
 def health_check():
@@ -128,48 +144,51 @@ def health_check():
         "verifiedPassages": len(sargas_db),
         "unverifiedWithheld": len(all_chapters) - len(sargas_db),
         "corpusComplete": False,
-        "retrievalReady": len(sargas_db) > 0
+        "retrievalReady": len(sargas_db) > 0,
     }
+
 
 @app.get("/coverage")
 def get_coverage():
     report_path = os.path.join(assets_dir, "coverage_report.json")
     if os.path.exists(report_path):
-        with open(report_path, 'r', encoding='utf-8') as f:
+        with open(report_path, "r", encoding="utf-8") as f:
             return json.load(f)
     return {"error": "Coverage report not found."}
+
 
 @app.post("/search")
 def search(req: SearchRequest, x_sitaram_key: Optional[str] = Header(None)):
     verify_app_key(x_sitaram_key)
-    
+
     query = req.query.lower()
     results = []
     for sarga in sargas_db:
-        # BM25 / Keyword lookup
         score = 0
         if query in sarga.get("englishText", "").lower():
             score += 10
         if query in sarga.get("chapterTitleEnglish", "").lower():
             score += 20
-            
+
         if score > 0:
-            results.append({
-                "documentId": sarga.get("id"),
-                "kanda": sarga.get("kanda"),
-                "sarga": sarga.get("chapterNumber"),
-                "text": sarga.get("englishText"),
-                "score": score
-            })
-            
-    # Sort and limit
-    results = sorted(results, key=lambda x: x["score"], reverse=True)[:req.limit]
+            results.append(
+                {
+                    "documentId": sarga.get("id"),
+                    "kanda": sarga.get("kanda"),
+                    "sarga": sarga.get("chapterNumber"),
+                    "text": sarga.get("englishText"),
+                    "score": score,
+                }
+            )
+
+    results = sorted(results, key=lambda item: item["score"], reverse=True)[: req.limit]
     return {"results": results}
+
 
 @app.post("/ask")
 def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
     verify_app_key(x_sitaram_key)
-    
+
     if check_safety(req.question):
         return {
             "answer": "The approved SitaRam AI system prompt prevents generating speculative, ungrounded, or non-scriptural predictions and claims. Please ask questions grounded directly in the text.",
@@ -179,21 +198,19 @@ def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
             "citations": [],
             "interpretationLabel": "Safety refusal",
             "limitations": ["Request violated safety parameters."],
-            "retrieval": {"passagesConsidered": 0, "passagesUsed": 0}
+            "retrieval": {"passagesConsidered": 0, "passagesUsed": 0},
         }
-        
-    # Hybrid RAG retrieval
+
     context = []
     for sarga in sargas_db:
-        # filter matches
         kanda_filter = req.filters.get("kandaId") if req.filters else None
         if kanda_filter and sarga.get("kandaId") != kanda_filter:
             continue
-            
+
         context.append(sarga)
         if len(context) >= MAX_CONTEXT_PASSAGES:
             break
-            
+
     if not context:
         return {
             "answer": "The approved SitaRam knowledge base does not contain enough evidence to answer this confidently.",
@@ -203,16 +220,19 @@ def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
             "citations": [],
             "interpretationLabel": "No evidence",
             "limitations": ["No relevant passages retrieved."],
-            "retrieval": {"passagesConsidered": 0, "passagesUsed": 0}
+            "retrieval": {"passagesConsidered": 0, "passagesUsed": 0},
         }
 
-    # Verify citations and generate answer with citations
     citations = verify_citations(req.question, context)
-    
-    # Mocking standard grounded text answer generation based on context
+
+    # This remains an explicitly limited grounded summary path until the real
+    # model/provider generation layer is implemented and validated.
     first_passage = context[0].get("englishText", "")
-    answer_summary = f"Based on {context[0].get('kanda')}, Sarga {context[0].get('chapterNumber')}: {first_passage[:200]}..."
-    
+    answer_summary = (
+        f"Based on {context[0].get('kanda')}, Sarga "
+        f"{context[0].get('chapterNumber')}: {first_passage[:200]}..."
+    )
+
     return {
         "answer": answer_summary,
         "languageCode": req.languageCode,
@@ -220,24 +240,37 @@ def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
         "confidence": "high",
         "citations": citations,
         "interpretationLabel": "AI-generated explanation",
-        "limitations": [],
+        "limitations": [
+            "Current backend response generation is a limited grounded summary path, not a full production model response."
+        ],
         "retrieval": {
             "passagesConsidered": len(sargas_db),
-            "passagesUsed": len(context)
-        }
+            "passagesUsed": len(context),
+        },
     }
+
 
 @app.post("/feedback")
-def submit_feedback(req: FeedbackRequest, x_sitaram_key: Optional[str] = Header(None)):
+def submit_feedback(
+    req: FeedbackRequest, x_sitaram_key: Optional[str] = Header(None)
+):
     verify_app_key(x_sitaram_key)
-    logger.info(f"Feedback received for answer {req.answerId}: {req.rating} ({req.reason})")
+    logger.info(
+        "Feedback received for answer %s: %s (%s)",
+        req.answerId,
+        req.rating,
+        req.reason,
+    )
     return {
         "status": "success",
-        "message": "Thank you for your feedback. It has been added to the review queue."
+        "message": "Thank you for your feedback. It has been added to the review queue.",
     }
 
+
 @app.post("/verify-citation")
-def verify_citation(passage_id: str, x_sitaram_key: Optional[str] = Header(None)):
+def verify_citation(
+    passage_id: str, x_sitaram_key: Optional[str] = Header(None)
+):
     verify_app_key(x_sitaram_key)
     for sarga in sargas_db:
         if sarga.get("id") == passage_id:
