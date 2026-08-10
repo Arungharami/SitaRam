@@ -49,9 +49,11 @@ Run the master validation suite before any content release:
 ```bash
 python tools/validation/run_all.py
 python tools/validation/test_corpus_validation.py
-python tools/validation/verify_text_integrity.py
+python tools/validation/verify_text_integrity.py --baseline <trusted-baseline-ref>
 python tools/content_import/validate_json.py
 ```
+
+For pull requests targeting `main`, use `origin/main` as the trusted baseline after fetching the full branch history.
 
 Then inspect:
 
