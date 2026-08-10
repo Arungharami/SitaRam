@@ -3,7 +3,7 @@
 **Prepared:** August 10, 2026  
 **Package:** `com.leadai.sitaram`  
 **Current app version:** `1.0.0+1`  
-**Current target SDK:** API 35  
+**Current target SDK:** Android 16 / API 36  
 **Primary release path:** signed AAB → internal/closed testing → production
 
 ## Current repository state
@@ -17,6 +17,8 @@
 - [x] Public release copy has been rewritten to avoid unsupported completeness claims
 - [x] Privacy materials describe the current backend AI architecture
 - [x] Simulated donation flow removed from production Settings navigation
+- [x] Release branch upgraded to Android 16 / API 36
+- [x] Android Gradle Plugin 9.0.1 satisfies the Android packaging baseline for 16 KB page-size alignment
 
 ## Hard content gate
 
@@ -42,23 +44,38 @@ Before uploading a new release candidate:
 - [ ] Confirm the upload keystore matches the intended Play upload certificate
 - [ ] Confirm GitHub Actions signing secrets are present
 - [ ] Confirm `SITARAM_HF_ENDPOINT` is the production HTTPS endpoint
+- [ ] Confirm the production backend has `SITARAM_APP_KEY` configured as a deployment secret
 - [ ] Confirm the backend does not use a committed fallback application key
 - [ ] Confirm backend rate limiting / abuse controls are active
 - [ ] Run the Android Release Candidate workflow with Play upload disabled
 - [ ] Download and record the AAB SHA-256 checksum
+- [ ] Confirm the resulting AAB targets API 36
+- [ ] Confirm Play Console reports no 16 KB page-size compatibility blocker
 - [ ] Smoke test the resulting build on a physical Android device
 
-## Target API deadline
+## Target API status
 
-The project currently targets Android 15 / API 35.
+The release branch targets **Android 16 / API 36**.
 
-Google Play's published schedule says that beginning **August 31, 2026**, new apps and app updates for standard Android mobile apps must target **Android 16 / API 36 or higher**.
-
-Because this checklist was prepared on August 10, 2026, API 35 is still within the submission window today, but the professional path is to migrate, build, and test API 36 before the August 31 deadline rather than depend on a last-minute submission.
+Google Play's published schedule says that beginning **August 31, 2026**, standard Android new apps and updates must target **Android 16 / API 36 or higher**. The project now meets that target-SDK requirement ahead of the deadline, subject to successful build and runtime validation.
 
 Official reference:
 
 - https://support.google.com/googleplay/android-developer/answer/11926878
+
+## 16 KB page-size compatibility
+
+Google Play requires new apps and updates submitted for Android 15/API 35+ devices to support 16 KB memory page sizes. SitaRam is a Flutter application and ships native libraries, so final validation must use the generated release AAB.
+
+- [x] Android Gradle Plugin is 9.0.1 (above Android's AGP 8.5.1 packaging baseline)
+- [ ] Build the production AAB using the release workflow
+- [ ] Check Play Console compatibility results for the uploaded AAB
+- [ ] Confirm there is no 16 KB page-size compatibility error
+- [ ] When possible, run the release build on a 16 KB Android 15/16 emulator or supported device
+
+Official reference:
+
+- https://developer.android.com/guide/practices/page-sizes
 
 ## Play Console app setup
 
@@ -97,10 +114,6 @@ Complete each Play Console declaration according to the actual release build:
 - [ ] No private provider credential is embedded as a reusable server secret in the app bundle
 
 Google Play's AI-generated content guidance requires developers to prevent prohibited AI output and provide appropriate safeguards and user feedback mechanisms for covered generative-AI experiences.
-
-Official reference:
-
-- https://support.google.com/googleplay/android-developer/answer/14094294
 
 ## Testing track
 
