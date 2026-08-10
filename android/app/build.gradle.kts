@@ -35,9 +35,9 @@ android {
     defaultConfig {
         applicationId = "com.leadai.sitaram"
 
-        // just_audio requires minSdk 21; target latest stable API
+        // just_audio requires minSdk 21; target Android 16 for current Play policy.
         minSdk    = 21
-        targetSdk = 35
+        targetSdk = 36
 
         versionCode = flutter.versionCode
         versionName = flutter.versionName
