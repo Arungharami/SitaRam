@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -40,7 +42,7 @@ jobs:
         run: |
           python tools/validation/run_all.py
           python tools/validation/test_corpus_validation.py
-          python tools/validation/verify_text_integrity.py
+          python tools/validation/verify_text_integrity.py --baseline origin/main
           python tools/content_import/validate_json.py
 
       - name: Run backend tests
