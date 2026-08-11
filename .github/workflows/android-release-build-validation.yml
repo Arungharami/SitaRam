@@ -1,0 +1,124 @@
+name: Android Release Build Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'android/**'
+      - 'lib/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/android-release-build-validation.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'android/**'
+      - 'lib/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/android-release-build-validation.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sitaram-release-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-release-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Run analyzer
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Create disposable validation signing key
+        run: |
+          set -euo pipefail
+          keytool -genkeypair \
+            -keystore android/validation-keystore.jks \
+            -storepass validation-only \
+            -keypass validation-only \
+            -alias validation \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 1 \
+            -dname "CN=SitaRam Release Validation, O=CI, C=US"
+          cat > android/key.properties <<'EOF'
+          storePassword=validation-only
+          keyPassword=validation-only
+          keyAlias=validation
+          storeFile=../validation-keystore.jks
+          EOF
+          chmod 600 android/validation-keystore.jks android/key.properties
+
+      - name: Build optimized API 36 validation bundle
+        run: |
+          flutter build appbundle --release \
+            --dart-define=SITARAM_HF_ENDPOINT=https://validation.invalid \
+            --dart-define=SITARAM_HF_APP_KEY=validation-not-production
+
+      - name: Verify bundle packaging
+        run: |
+          set -euo pipefail
+          AAB=build/app/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          sha256sum "$AAB"
+          echo "Native libraries packaged in bundle:"
+          unzip -l "$AAB" | grep -E 'base/lib/.+\.so$' || true
+          echo "Release bundle validation passed. This validation bundle is not retained and must never be uploaded to Google Play."
+
+      - name: Remove disposable signing material
+        if: ${{ always() }}
+        run: rm -f android/validation-keystore.jks android/key.properties
+
+  report-main-validation:
+    if: ${{ always() && github.event_name == 'push' }}
+    needs: validate-release-bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report result to release status issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ needs.validate-release-bundle.result }}';
+            const icon = result === 'success' ? '✅' : '❌';
+            const body = `${icon} **Main API 36 release-build validation** — ${result.toUpperCase()}\n\n` +
+              `Commit: \`${context.sha.substring(0, 12)}\`\n` +
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n` +
+              (result === 'success'
+                ? 'The optimized Android release bundle compiled successfully from `main` using an explicit disposable CI certificate. No validation artifact was retained or uploaded. Production signing remains gated on the verified SitaRam upload keystore and deployment secrets.'
+                : 'The Android release bundle did not compile successfully. Inspect the run before attempting any Play release.');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 7,
+              body,
+            });
