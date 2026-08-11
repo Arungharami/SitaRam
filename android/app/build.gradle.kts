@@ -10,6 +10,19 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
+// A production release must never silently fall back to the Android debug key.
+// CI preflight builds that need a non-production signature must create their own
+// explicitly temporary key.properties/keystore before invoking a Release task.
+val releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.contains("release", ignoreCase = true)
+}
+if (releaseTaskRequested && !keystorePropertiesFile.exists()) {
+    throw GradleException(
+        "Release signing credentials are missing. Configure android/key.properties " +
+            "from the verified SitaRam upload keystore; debug-signing fallback is prohibited."
+    )
+}
+
 android {
     namespace = "com.leadai.sitaram"
     compileSdk = flutter.compileSdkVersion
@@ -24,10 +37,10 @@ android {
     signingConfigs {
         create("release") {
             if (keystorePropertiesFile.exists()) {
-                keyAlias     = keystoreProperties["keyAlias"]     as String
-                keyPassword  = keystoreProperties["keyPassword"]  as String
-                storeFile    = file(keystoreProperties["storeFile"] as String)
-                storePassword= keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
             }
         }
     }
@@ -36,7 +49,7 @@ android {
         applicationId = "com.leadai.sitaram"
 
         // just_audio requires minSdk 21; target Android 16 for current Play policy.
-        minSdk    = 21
+        minSdk = 21
         targetSdk = 36
 
         versionCode = flutter.versionCode
@@ -52,18 +65,17 @@ android {
         // ── Debug (unchanged) ────────────────────────────────────────────────
         debug {
             applicationIdSuffix = ".debug"
-            versionNameSuffix   = "-debug"
+            versionNameSuffix = "-debug"
         }
 
         // ── Release (production) ─────────────────────────────────────────────
         release {
-            signingConfig = if (keystorePropertiesFile.exists())
-                signingConfigs.getByName("release")
-            else
-                signingConfigs.getByName("debug") // fallback for CI without key
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
 
             // Enable R8 shrinking & resource stripping
-            isMinifyEnabled   = true
+            isMinifyEnabled = true
             isShrinkResources = true
 
             proguardFiles(
