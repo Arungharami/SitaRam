@@ -1,0 +1,93 @@
+name: Android Release Preflight
+
+on:
+  push:
+    branches:
+      - release/play-internal
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: sitaram-android-preflight
+  cancel-in-progress: true
+
+jobs:
+  build-api36-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build optimized API 36 preflight AAB
+        run: |
+          flutter build appbundle --release \
+            --dart-define=SITARAM_HF_ENDPOINT=https://preflight.invalid \
+            --dart-define=SITARAM_HF_APP_KEY=preflight-not-production
+
+      - name: Inspect bundle
+        run: |
+          set -euo pipefail
+          AAB=build/app/outputs/bundle/release/app-release.aab
+          test -s "$AAB"
+          sha256sum "$AAB" | tee "$AAB.sha256"
+          echo "Native libraries packaged in bundle:"
+          unzip -l "$AAB" | grep -E 'base/lib/.+\.so$' || true
+          echo "IMPORTANT: this preflight uses the debug-signing fallback and placeholder backend values. It must never be uploaded to Google Play."
+
+      - name: Upload preflight evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitaram-api36-preflight-do-not-upload
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/bundle/release/app-release.aab.sha256
+          retention-days: 7
+          if-no-files-found: error
+
+  report-preflight:
+    if: ${{ always() }}
+    needs: build-api36-preflight
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report preflight result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ needs.build-api36-preflight.result }}';
+            const icon = result === 'success' ? '✅' : '❌';
+            const body = `${icon} **SitaRam API 36 Release Preflight** — ${result.toUpperCase()}\n\n` +
+              `Commit: \`${context.sha.substring(0, 12)}\`\n` +
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n` +
+              (result === 'success'
+                ? 'Optimized release AAB built successfully with placeholder backend configuration and debug-signing fallback. This artifact is validation-only and MUST NOT be uploaded to Play. Production publication remains gated on the real upload keystore/backend/Play secrets.'
+                : 'Preflight bundle build failed. Inspect the run for the exact Android/Flutter build blocker.');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 2,
+              body,
+            });
