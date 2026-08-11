@@ -62,11 +62,12 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_UPLOAD_CERT_SHA256: ${{ secrets.ANDROID_UPLOAD_CERT_SHA256 }}
           SITARAM_HF_ENDPOINT: ${{ secrets.SITARAM_HF_ENDPOINT }}
           SITARAM_HF_APP_KEY: ${{ secrets.SITARAM_HF_APP_KEY }}
         run: |
           set -euo pipefail
-          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD ANDROID_STORE_PASSWORD SITARAM_HF_ENDPOINT SITARAM_HF_APP_KEY; do
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD ANDROID_STORE_PASSWORD ANDROID_UPLOAD_CERT_SHA256 SITARAM_HF_ENDPOINT SITARAM_HF_APP_KEY; do
             if [ -z "${!name:-}" ]; then
               echo "Missing required GitHub Actions secret: $name" >&2
               exit 1
@@ -132,19 +133,25 @@ jobs:
         env:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_UPLOAD_CERT_SHA256: ${{ secrets.ANDROID_UPLOAD_CERT_SHA256 }}
         run: |
           set -euo pipefail
-          EXPECTED_SHA256="0A:6F:CB:51:2B:D5:C1:9E:9A:4F:72:18:3C:20:7E:03:94:B5:11:14:E5:13:3C:49:58:E0:98:15:4C:3C:3A:B0"
+          EXPECTED_HEX="$(printf '%s' "$ANDROID_UPLOAD_CERT_SHA256" | tr '[:lower:]' '[:upper:]' | sed 's/[^0-9A-F]//g')"
           ACTUAL_SHA256="$(keytool -list -v \
             -keystore android/upload-keystore.jks \
             -storepass "$ANDROID_STORE_PASSWORD" \
             -alias "$ANDROID_KEY_ALIAS" \
             | grep 'SHA256:' | head -n 1 | sed 's/.*SHA256: //' | tr -d '\r')"
-          if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
-            echo "Upload certificate fingerprint does not match the certificate registered for com.leadai.sitaram." >&2
+          ACTUAL_HEX="$(printf '%s' "$ACTUAL_SHA256" | tr '[:lower:]' '[:upper:]' | sed 's/[^0-9A-F]//g')"
+          if [ ${#EXPECTED_HEX} -ne 64 ]; then
+            echo "ANDROID_UPLOAD_CERT_SHA256 is not a valid SHA-256 certificate fingerprint." >&2
             exit 1
           fi
-          echo "Registered SitaRam upload certificate fingerprint verified."
+          if [ "$ACTUAL_HEX" != "$EXPECTED_HEX" ]; then
+            echo "Upload certificate fingerprint does not match the Google Play Upload key certificate for com.leadai.sitaram." >&2
+            exit 1
+          fi
+          echo "Google Play Upload key certificate fingerprint verified."
 
       - name: Build signed Android App Bundle
         env:
