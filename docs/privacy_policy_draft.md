@@ -4,7 +4,8 @@
 **App:** SitaRam  
 **Package:** `com.leadai.sitaram`  
 **Developer:** Lead.AI Labs  
-**Contact:** a.gharami.325@westcliff.edu
+**Canonical policy URL:** https://lead-ai.us/sitaram/privacy.html  
+**Contact:** support@lead-ai.us
 
 ## 1. Overview
 
@@ -71,4 +72,4 @@ This policy may be updated when app features, service providers, or data practic
 
 ## 11. Contact
 
-For privacy questions or requests, contact: **a.gharami.325@westcliff.edu**
+For privacy questions or requests, contact: **support@lead-ai.us**
