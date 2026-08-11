@@ -1,28 +1,41 @@
 # SitaRam Production Release Secrets Setup
 
-This document covers the only credentials that must remain outside source control before SitaRam can be signed and published through GitHub Actions.
+This document covers the credentials that must remain outside source control before SitaRam can be signed and published through GitHub Actions.
 
 ## Security rule
 
 **Never paste keystore passwords, application keys, Hugging Face tokens, or Google Play service-account JSON into commits, issues, pull requests, screenshots, or chat.** Enter them only into the intended GitHub/Hugging Face secret interfaces.
 
-## 1. Verify the existing SitaRam upload key first
+## 1. Identify the correct Google Play certificate
 
-Google Play registration for `com.leadai.sitaram` is associated with the following SHA-256 certificate fingerprint:
+Google Play App Signing uses two distinct keys:
+
+- **Upload key** — held by the developer and used to sign the `.aab` before upload.
+- **App signing key** — held by Google Play and used to sign the APKs delivered to users.
+
+For CI signing, use the SHA-256 shown specifically under **Upload key certificate** in Google Play Console. Do not use the App signing key certificate fingerprint for the local upload keystore check.
+
+Play Console path:
+
+`SitaRam → App integrity / Play app signing → Upload key certificate`
+
+Copy the **SHA-256 certificate fingerprint** exactly and store it as the GitHub Actions secret:
 
 ```text
-0A:6F:CB:51:2B:D5:C1:9E:9A:4F:72:18:3C:20:7E:03:94:B5:11:14:E5:13:3C:49:58:E0:98:15:4C:3C:3A:B0
+ANDROID_UPLOAD_CERT_SHA256
 ```
 
-On the computer that contains the **existing SitaRam upload keystore**, verify it before configuring CI:
+The SHA-1 value is useful for some integrations but is not used by the release workflow's signing verification.
+
+On the computer that contains the existing SitaRam upload keystore, verify it locally:
 
 ```bash
-keytool -list -v -keystore /secure/path/to/sitaram-upload-keystore.jks
+keytool -list -v -keystore /secure/path/to/sitaram-upload-keystore.jks -alias YOUR_ALIAS
 ```
 
-The SHA-256 fingerprint printed by `keytool` must match the registered fingerprint above.
+The SHA-256 printed by `keytool` must match Google Play's **Upload key certificate SHA-256**.
 
-**If it does not match, stop. Do not create or substitute another key just to make CI pass.** Use the Play Console upload-key recovery/reset process if the original upload key has been lost.
+**If it does not match, stop. Do not create or substitute another key merely to make CI pass.** If Play App Signing is enabled and the original upload key is lost, use Google Play's upload-key reset process.
 
 ## 2. GitHub Actions secrets
 
@@ -30,7 +43,7 @@ Open:
 
 `Arungharami/SitaRam` → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
 
-Configure exactly these repository secrets:
+Configure these repository secrets:
 
 | Secret | Required value |
 |---|---|
@@ -38,6 +51,7 @@ Configure exactly these repository secrets:
 | `ANDROID_KEY_ALIAS` | Alias inside that SitaRam keystore |
 | `ANDROID_KEY_PASSWORD` | Password for the upload key entry |
 | `ANDROID_STORE_PASSWORD` | Password for the keystore |
+| `ANDROID_UPLOAD_CERT_SHA256` | SHA-256 from Play Console's **Upload key certificate** section |
 | `SITARAM_HF_ENDPOINT` | Production SitaRam backend HTTPS endpoint |
 | `SITARAM_HF_APP_KEY` | App-to-backend access token matching the backend `SITARAM_APP_KEY` secret |
 | `PLAY_SERVICE_ACCOUNT_JSON` | Full JSON for the Google Play publishing service account authorized for `com.leadai.sitaram` |
@@ -108,13 +122,16 @@ The normal production workflow is:
 .github/workflows/android-release-candidate.yml
 ```
 
-The temporary release-engineering branch `release/play-internal` also contains a guarded Play-internal trigger used during initial publication work. It must not be merged into `main` with automatic branch-push publication enabled.
-
 A signed release should proceed only after:
 
-1. the upload-certificate fingerprint matches the registered SitaRam certificate;
-2. all seven GitHub Actions secrets above exist;
+1. the local upload keystore SHA-256 matches Google Play's **Upload key certificate SHA-256**;
+2. all required GitHub Actions secrets above exist;
 3. the production backend is healthy and has `SITARAM_APP_KEY` configured;
 4. the API 36 release build passes tests;
 5. the generated AAB passes Google Play technical validation, including 16 KB page-size requirements;
 6. store listing, Data Safety, content rating, AI-related declarations, and required testing are complete.
+
+## 7. Google references
+
+- Play App Signing / upload-key concepts and reset flow: https://support.google.com/googleplay/android-developer/answer/9842756
+- Android Studio signing setup: https://developer.android.com/studio/publish/app-signing
