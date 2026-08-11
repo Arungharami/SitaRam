@@ -13,6 +13,9 @@ on:
         required: false
         type: string
         default: Automated SitaRam release candidate
+  push:
+    branches:
+      - release/play-internal
 
 permissions:
   contents: read
@@ -78,7 +81,7 @@ jobs:
           esac
 
       - name: Validate Google Play upload secret
-        if: ${{ inputs.upload_to_internal_testing }}
+        if: ${{ github.event_name == 'push' || inputs.upload_to_internal_testing }}
         env:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
@@ -130,24 +133,24 @@ jobs:
           retention-days: 14
 
       - name: Prepare Google Play release notes
-        if: ${{ inputs.upload_to_internal_testing }}
+        if: ${{ github.event_name == 'push' || inputs.upload_to_internal_testing }}
         env:
-          RELEASE_NOTES: ${{ inputs.release_notes }}
+          RELEASE_NOTES: ${{ github.event_name == 'push' && 'Initial SitaRam release candidate for Ramayana study with source-aware AI guidance.' || inputs.release_notes }}
         run: |
           set -euo pipefail
           mkdir -p distribution/whatsnew
           printf '%s\n' "$RELEASE_NOTES" > distribution/whatsnew/whatsnew-en-US
 
       - name: Upload to Google Play internal testing
-        if: ${{ inputs.upload_to_internal_testing }}
+        if: ${{ github.event_name == 'push' || inputs.upload_to_internal_testing }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.leadai.sitaram
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: internal
-          status: draft
-          releaseName: ${{ github.ref_name }}-${{ github.run_number }}
+          status: completed
+          releaseName: sitaram-${{ github.run_number }}
           whatsNewDirectory: distribution/whatsnew
 
       - name: Remove restored signing material
