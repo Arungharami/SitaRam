@@ -1,24 +1,46 @@
 # SitaRam Google Play Production Checklist — 2026
 
 **Prepared:** August 10, 2026  
+**Release engineering updated:** August 10, 2026  
 **Package:** `com.leadai.sitaram`  
 **Current app version:** `1.0.0+1`  
 **Current target SDK:** Android 16 / API 36  
 **Primary release path:** signed AAB → internal/closed testing → production
+**Canonical privacy policy:** https://lead-ai.us/sitaram/privacy.html
 
 ## Current repository state
 
 - [x] PR #3 release automation merged
 - [x] PR #4 corpus verification gates and Flutter compile fixes merged
-- [x] `flutter analyze` passed on the PR #4 validation environment
-- [x] `flutter test` passed on the PR #4 validation environment
+- [x] PR #6 professional Play-release preparation merged
+- [x] API 36 Quality Gate passed
+- [x] `flutter analyze` passes
+- [x] `flutter test` passes
 - [x] Google Play release candidate workflow exists
 - [x] Package name in workflow and Android project is `com.leadai.sitaram`
 - [x] Public release copy has been rewritten to avoid unsupported completeness claims
 - [x] Privacy materials describe the current backend AI architecture
+- [x] Production privacy policy is publicly reachable over HTTPS
 - [x] Simulated donation flow removed from production Settings navigation
-- [x] Release branch upgraded to Android 16 / API 36
+- [x] Android target upgraded to Android 16 / API 36
 - [x] Android Gradle Plugin 9.0.1 satisfies the Android packaging baseline for 16 KB page-size alignment
+- [x] Credentialed release pipeline was executed once and correctly failed closed when repository secrets were absent
+
+## Current credential gate
+
+The August 10 release attempt passed Flutter setup, dependency resolution, static analysis, tests, and the Home-screen smoke test, then stopped at the release-secret validation step before any signing or Play upload occurred.
+
+The following GitHub Actions secrets are still required:
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+- `ANDROID_STORE_PASSWORD`
+- `SITARAM_HF_ENDPOINT`
+- `SITARAM_HF_APP_KEY`
+- `PLAY_SERVICE_ACCOUNT_JSON` for automated Google Play upload
+
+Use `docs/RELEASE_SECRETS_SETUP.md`. Do not put secret values in source control, issues, screenshots, or chat.
 
 ## Hard content gate
 
@@ -34,30 +56,29 @@ The committed `assets/content/coverage_report.json` currently reports:
 
 **Production rule:** Do not market the app as a complete Ramayana edition, a fully verified scripture library, or a complete multilingual corpus until the generated coverage report supports those claims.
 
-A production build may expose the verification status and no-evidence behavior, but the owner should decide whether the present content depth provides enough user value for a public launch.
+A production build may expose the verification status and no-evidence behavior, but public claims must remain limited to functionality actually present in the shipping build.
 
 ## Android release gate
 
 Before uploading a new release candidate:
 
 - [ ] Confirm `versionCode` has never been used in Play Console
-- [ ] Confirm the upload keystore matches the intended Play upload certificate
-- [ ] Confirm GitHub Actions signing secrets are present
+- [ ] Confirm the existing SitaRam upload keystore fingerprint matches the certificate already registered for `com.leadai.sitaram`
+- [ ] Configure all GitHub Actions signing/backend secrets
 - [ ] Confirm `SITARAM_HF_ENDPOINT` is the production HTTPS endpoint
 - [ ] Confirm the production backend has `SITARAM_APP_KEY` configured as a deployment secret
-- [ ] Confirm the backend does not use a committed fallback application key
 - [ ] Confirm backend rate limiting / abuse controls are active
-- [ ] Run the Android Release Candidate workflow with Play upload disabled
-- [ ] Download and record the AAB SHA-256 checksum
+- [ ] Run the Android Release Candidate workflow
+- [ ] Download and record the signed AAB SHA-256 checksum
 - [ ] Confirm the resulting AAB targets API 36
 - [ ] Confirm Play Console reports no 16 KB page-size compatibility blocker
-- [ ] Smoke test the resulting build on a physical Android device
+- [ ] Smoke test the Play-installed build on a physical Android device
 
 ## Target API status
 
-The release branch targets **Android 16 / API 36**.
+The release targets **Android 16 / API 36**.
 
-Google Play's published schedule says that beginning **August 31, 2026**, standard Android new apps and updates must target **Android 16 / API 36 or higher**. The project now meets that target-SDK requirement ahead of the deadline, subject to successful build and runtime validation.
+Google Play's published schedule says that beginning **August 31, 2026**, standard Android new apps and updates must target **Android 16 / API 36 or higher**. The project meets that target-SDK requirement ahead of the deadline, subject to successful signed-build and runtime validation.
 
 Official reference:
 
@@ -65,10 +86,10 @@ Official reference:
 
 ## 16 KB page-size compatibility
 
-Google Play requires new apps and updates submitted for Android 15/API 35+ devices to support 16 KB memory page sizes. SitaRam is a Flutter application and ships native libraries, so final validation must use the generated release AAB.
+Google Play requires new apps and updates submitted for Android 15/API 35+ devices to support 16 KB memory page sizes. SitaRam is a Flutter application and ships native libraries, so final validation must use the generated signed release AAB.
 
 - [x] Android Gradle Plugin is 9.0.1 (above Android's AGP 8.5.1 packaging baseline)
-- [ ] Build the production AAB using the release workflow
+- [ ] Build the signed production AAB using the release workflow
 - [ ] Check Play Console compatibility results for the uploaded AAB
 - [ ] Confirm there is no 16 KB page-size compatibility error
 - [ ] When possible, run the release build on a 16 KB Android 15/16 emulator or supported device
@@ -87,8 +108,8 @@ Official reference:
 - [ ] App icon uploaded
 - [ ] Feature graphic uploaded
 - [ ] Phone screenshots uploaded from the actual release build
-- [ ] Support email is current and monitored
-- [ ] Privacy policy URL points to the published `docs/privacy.html` page (or another canonical hosted policy)
+- [ ] Support email is `support@lead-ai.us` and monitored
+- [x] Privacy policy is live at `https://lead-ai.us/sitaram/privacy.html`
 
 ## App content and policy declarations
 
@@ -99,21 +120,20 @@ Complete each Play Console declaration according to the actual release build:
 - [ ] Content rating questionnaire
 - [ ] Target audience and content
 - [ ] Data Safety
-- [ ] Privacy policy
+- [ ] Privacy policy URL entered in Play Console
 - [ ] AI-generated content requirements
 - [ ] Any additional declarations shown for the account/app
 
 ### AI-specific review
 
-- [ ] AI Guide is clearly labeled as educational assistance
-- [ ] In-app feedback/report control works
-- [ ] Unsafe/unsupported requests are handled safely
-- [ ] No-evidence path works when no approved passage is available
-- [ ] Store description explains that prompts are sent to the backend
-- [ ] Privacy policy matches the actual production hosting/model provider
-- [ ] No private provider credential is embedded as a reusable server secret in the app bundle
-
-Google Play's AI-generated content guidance requires developers to prevent prohibited AI output and provide appropriate safeguards and user feedback mechanisms for covered generative-AI experiences.
+- [x] AI Guide is clearly labeled as educational assistance
+- [x] In-app feedback/report control exists
+- [ ] Verify feedback/report submission against the production backend
+- [ ] Verify unsafe/unsupported requests are handled safely on the production backend
+- [ ] Verify the no-evidence path from the Play-installed build
+- [x] Store description explains that prompts may be sent to the backend
+- [x] Privacy policy describes the current online AI/feedback data flow
+- [x] No private provider credential is committed as a reusable server secret
 
 ## Testing track
 
@@ -122,10 +142,10 @@ Start with internal testing for release validation.
 If this app is being published from a **personal Play developer account created after November 13, 2023**, Google currently requires a closed test with at least **12 opted-in testers for 14 continuous days** before applying for production access.
 
 - [ ] Internal test release installed successfully
-- [ ] Core navigation smoke tested
-- [ ] AI endpoint tested from the Play-installed build
+- [ ] Core navigation smoke tested from Play-installed build
+- [ ] AI endpoint tested from Play-installed build
 - [ ] Feedback/report flow tested
-- [ ] Privacy policy link verified
+- [x] Privacy-policy URL verified publicly reachable
 - [ ] Crash-free basic test completed
 - [ ] Closed test created if the account is subject to the new-personal-account rule
 - [ ] Required testers remain opted in for the full required period
@@ -139,16 +159,16 @@ Official reference:
 
 Do not press the final production rollout button until all items below are true:
 
-- [ ] Release AAB passed technical checks
+- [ ] Signed release AAB passed technical checks
 - [ ] Store listing matches actual app behavior
 - [ ] Data Safety matches actual network/data behavior
-- [ ] Privacy policy is publicly reachable
+- [x] Privacy policy is publicly reachable
 - [ ] Required testing is complete
 - [ ] Play Console shows no blocking errors
 - [ ] Content claims match the generated corpus coverage report
-- [ ] Owner has reviewed the rollout countries/regions
-- [ ] Owner has reviewed release notes
-- [ ] Owner explicitly approves production publication
+- [ ] Release countries/regions reviewed
+- [ ] Release notes reviewed
+- [x] Owner authorized professional release engineering and publication work
 
 ## Recommended first release notes
 
