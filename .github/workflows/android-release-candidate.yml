@@ -77,6 +77,29 @@ jobs:
             *) echo "SITARAM_HF_ENDPOINT must use HTTPS for a release build." >&2; exit 1 ;;
           esac
 
+      - name: Verify production backend health and app key
+        env:
+          SITARAM_HF_ENDPOINT: ${{ secrets.SITARAM_HF_ENDPOINT }}
+          SITARAM_HF_APP_KEY: ${{ secrets.SITARAM_HF_APP_KEY }}
+        run: |
+          set -euo pipefail
+          BASE_URL="${SITARAM_HF_ENDPOINT%/}"
+          curl --fail --silent --show-error --max-time 20 "$BASE_URL/health" > /tmp/sitaram-health.json
+          python - <<'PY'
+          import json
+          with open('/tmp/sitaram-health.json', encoding='utf-8') as f:
+              payload = json.load(f)
+          if payload.get('status') != 'ok':
+              raise SystemExit('Production SitaRam backend health status is not ok.')
+          print('Production backend health check passed.')
+          PY
+          curl --fail --silent --show-error --max-time 20 \
+            -H "X-SitaRam-Key: $SITARAM_HF_APP_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"question":"release authentication check","languageCode":"en","mode":"student"}' \
+            "$BASE_URL/ask" > /dev/null
+          echo "Production backend app-key authentication passed."
+
       - name: Validate Google Play upload secret
         if: ${{ inputs.upload_to_internal_testing }}
         env:
@@ -104,6 +127,24 @@ jobs:
           storeFile=../upload-keystore.jks
           EOF
           chmod 600 android/upload-keystore.jks android/key.properties
+
+      - name: Verify registered SitaRam upload certificate
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA256="0A:6F:CB:51:2B:D5:C1:9E:9A:4F:72:18:3C:20:7E:03:94:B5:11:14:E5:13:3C:49:58:E0:98:15:4C:3C:3A:B0"
+          ACTUAL_SHA256="$(keytool -list -v \
+            -keystore android/upload-keystore.jks \
+            -storepass "$ANDROID_STORE_PASSWORD" \
+            -alias "$ANDROID_KEY_ALIAS" \
+            | grep 'SHA256:' | head -n 1 | sed 's/.*SHA256: //' | tr -d '\r')"
+          if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
+            echo "Upload certificate fingerprint does not match the certificate registered for com.leadai.sitaram." >&2
+            exit 1
+          fi
+          echo "Registered SitaRam upload certificate fingerprint verified."
 
       - name: Build signed Android App Bundle
         env:
