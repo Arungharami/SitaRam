@@ -16,6 +16,8 @@ on:
   push:
     branches:
       - release/play-internal
+    paths:
+      - docs/release/play-internal-trigger.md
 
 permissions:
   contents: read
@@ -35,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
