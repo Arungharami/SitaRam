@@ -42,6 +42,26 @@ jobs:
       - name: Test
         run: flutter test
 
+      - name: Create disposable preflight signing key
+        run: |
+          set -euo pipefail
+          keytool -genkeypair \
+            -keystore android/preflight-keystore.jks \
+            -storepass preflight-only \
+            -keypass preflight-only \
+            -alias preflight \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 1 \
+            -dname "CN=SitaRam Preflight, O=CI, C=US"
+          cat > android/key.properties <<'EOF'
+          storePassword=preflight-only
+          keyPassword=preflight-only
+          keyAlias=preflight
+          storeFile=../preflight-keystore.jks
+          EOF
+          chmod 600 android/preflight-keystore.jks android/key.properties
+
       - name: Build optimized API 36 preflight AAB
         run: |
           flutter build appbundle --release \
@@ -56,7 +76,7 @@ jobs:
           sha256sum "$AAB" | tee "$AAB.sha256"
           echo "Native libraries packaged in bundle:"
           unzip -l "$AAB" | grep -E 'base/lib/.+\.so$' || true
-          echo "IMPORTANT: this preflight uses the debug-signing fallback and placeholder backend values. It must never be uploaded to Google Play."
+          echo "IMPORTANT: this preflight uses a disposable CI certificate and placeholder backend values. It must never be uploaded to Google Play."
 
       - name: Upload preflight evidence
         uses: actions/upload-artifact@v4
@@ -67,6 +87,10 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab.sha256
           retention-days: 7
           if-no-files-found: error
+
+      - name: Remove disposable signing material
+        if: ${{ always() }}
+        run: rm -f android/preflight-keystore.jks android/key.properties
 
   report-preflight:
     if: ${{ always() }}
@@ -83,8 +107,8 @@ jobs:
               `Commit: \`${context.sha.substring(0, 12)}\`\n` +
               `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n` +
               (result === 'success'
-                ? 'Optimized release AAB built successfully with placeholder backend configuration and debug-signing fallback. This artifact is validation-only and MUST NOT be uploaded to Play. Production publication remains gated on the real upload keystore/backend/Play secrets.'
-                : 'Preflight bundle build failed. Inspect the run for the exact Android/Flutter build blocker.');
+                ? 'Optimized API 36 release AAB built successfully using an explicit disposable CI certificate and placeholder backend configuration. This artifact is validation-only and MUST NOT be uploaded to Play. Production publication remains gated on the verified SitaRam upload keystore/backend/Play secrets.'
+                : 'Preflight bundle build failed. Inspect the run for the exact Android/Flutter release-build blocker.');
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
