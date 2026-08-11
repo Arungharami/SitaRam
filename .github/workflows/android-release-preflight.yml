@@ -88,6 +88,6 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: 2,
+              issue_number: 7,
               body,
             });
