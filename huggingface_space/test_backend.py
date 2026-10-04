@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import unittest
+from unittest.mock import patch
 
 # Tests must configure the same explicit app-key path required in production.
 # The value is test-only and is set before importing the backend module.
@@ -123,6 +124,30 @@ class TestRetrievalTrustGate(unittest.TestCase):
         citations = backend.verify_citations("answer", [sample])
         self.assertEqual(citations[0]["edition"], "Verified test edition")
         self.assertEqual(citations[0]["translator"], "Test Translator")
+
+
+class TestQuestionGrounding(unittest.TestCase):
+    def test_unrelated_approved_passage_is_not_used_as_an_answer(self):
+        with patch.object(backend, "sargas_db", [{"id": "x", "englishText": "Valmiki meets Narada."}]):
+            response = client.post("/ask", headers={"X-SitaRam-Key": os.environ["SITARAM_APP_KEY"]},
+                                   json={"question": "quantum computers"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["citations"], [])
+        self.assertEqual(response.json()["interpretationLabel"], "No evidence")
+
+    def test_only_the_retrieved_excerpt_is_cited(self):
+        passages = [
+            {"id": "unrelated", "englishText": "Valmiki meets Narada."},
+            {"id": "matching", "englishText": "Rama accepts exile in the forest."},
+        ]
+        with patch.object(backend, "sargas_db", passages):
+            response = client.post("/ask", headers={"X-SitaRam-Key": os.environ["SITARAM_APP_KEY"]},
+                                   json={"question": "Why did Rama accept exile?"})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual([c["documentId"] for c in data["citations"]], ["matching"])
+        self.assertEqual(data["interpretationLabel"], "Retrieved source excerpt")
+        self.assertEqual(data["confidence"], "low")
 
 
 if __name__ == "__main__":

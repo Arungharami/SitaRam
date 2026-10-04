@@ -129,3 +129,7 @@ SitaRam AI is an educational study assistant, not a religious authority. The sys
 Pull requests are welcome. Keep changes focused, run the relevant Flutter/backend/corpus tests, and explain any content provenance or release impact in the PR description.
 
 **Jai Shri Ram**
+
+## Engineering review
+
+See [the October 4 correctness review](docs/ENGINEERING_REVIEW_2026-10-04.md) for repairs, exact verification results, and the next implementation work.
