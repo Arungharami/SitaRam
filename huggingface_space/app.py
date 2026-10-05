@@ -4,7 +4,8 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, Header, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from retrieval import rank_passages
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("sitaram-ai-backend")
@@ -54,13 +55,13 @@ except Exception as exc:
 
 
 class SearchRequest(BaseModel):
-    query: str
-    limit: int = 5
+    query: str = Field(min_length=1, max_length=2000)
+    limit: int = Field(default=5, ge=1, le=50)
     filters: Optional[Dict[str, Any]] = None
 
 
 class AskRequest(BaseModel):
-    question: str
+    question: str = Field(min_length=1, max_length=2000)
     languageCode: str = "en"
     mode: str = "student"
     filters: Optional[Dict[str, Any]] = None
@@ -161,27 +162,16 @@ def get_coverage():
 def search(req: SearchRequest, x_sitaram_key: Optional[str] = Header(None)):
     verify_app_key(x_sitaram_key)
 
-    query = req.query.lower()
-    results = []
-    for sarga in sargas_db:
-        score = 0
-        if query in sarga.get("englishText", "").lower():
-            score += 10
-        if query in sarga.get("chapterTitleEnglish", "").lower():
-            score += 20
-
-        if score > 0:
-            results.append(
-                {
-                    "documentId": sarga.get("id"),
-                    "kanda": sarga.get("kanda"),
-                    "sarga": sarga.get("chapterNumber"),
-                    "text": sarga.get("englishText"),
-                    "score": score,
-                }
-            )
-
-    results = sorted(results, key=lambda item: item["score"], reverse=True)[: req.limit]
+    results = [
+        {
+            "documentId": passage.get("id"), "kanda": passage.get("kanda"),
+            "sarga": passage.get("chapterNumber"), "text": passage.get("englishText"),
+            "score": score,
+        }
+        for passage, score in rank_passages(
+            req.query, sargas_db, filters=req.filters, limit=req.limit
+        )
+    ]
     return {"results": results}
 
 
@@ -201,15 +191,11 @@ def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
             "retrieval": {"passagesConsidered": 0, "passagesUsed": 0},
         }
 
-    context = []
-    for sarga in sargas_db:
-        kanda_filter = req.filters.get("kandaId") if req.filters else None
-        if kanda_filter and sarga.get("kandaId") != kanda_filter:
-            continue
-
-        context.append(sarga)
-        if len(context) >= MAX_CONTEXT_PASSAGES:
-            break
+    # The current response quotes one retrieved passage; cite only that passage.
+    # Never substitute the first corpus records for question-based retrieval.
+    context = [passage for passage, _ in rank_passages(
+        req.question, sargas_db, filters=req.filters, limit=1
+    )]
 
     if not context:
         return {
@@ -237,11 +223,12 @@ def ask(req: AskRequest, x_sitaram_key: Optional[str] = Header(None)):
         "answer": answer_summary,
         "languageCode": req.languageCode,
         "mode": req.mode,
-        "confidence": "high",
+        "confidence": "low",
         "citations": citations,
-        "interpretationLabel": "AI-generated explanation",
+        "interpretationLabel": "Retrieved source excerpt",
         "limitations": [
-            "Current backend response generation is a limited grounded summary path, not a full production model response."
+            "Lexical overlap does not establish that this excerpt answers the question.",
+            "The backend returns an English source excerpt; model generation and translated answers remain pending."
         ],
         "retrieval": {
             "passagesConsidered": len(sargas_db),
