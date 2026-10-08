@@ -1,5 +1,11 @@
 # SitaRam — Valmiki Ramayana Study & AI Research App
 
+## Start here
+
+Explore the Flutter app instructions below and the generated coverage report at `assets/content/coverage_report.json`. Corpus completeness and approval states must match that report.
+
+**Help improve this project:** [Contribution guide](CONTRIBUTING.md) · [Issues](https://github.com/Arungharami/SitaRam/issues)
+
 SitaRam is an open-source Flutter application for respectful Ramayana study, source review, multilingual reading workflows, and evidence-grounded AI assistance.
 
 > **Content status matters:** SitaRam does not treat imported text as verified scripture automatically. The committed coverage report is the source of truth for what has been imported, human-verified, approved for the app, and approved for AI retrieval.
